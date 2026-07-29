@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">Admin Console</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Admin</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="users">User Access</button>
+    <button class="tab" data-tab="academic">Academic</button>
+    <button class="tab" data-tab="results">Results</button>
+    <button class="tab" data-tab="attendance">Attendance</button>
+    <button class="tab" data-tab="fees">Fees</button>
+    <button class="tab" data-tab="documents">Documents</button>
+    <button class="tab" data-tab="calendar">Calendar</button>
+    <button class="tab" data-tab="comms">Communication</button>
+  </div>
+
+  <div class="panel" id="panel-overview">
+    <div class="grid">
+      <div class="card">
+        <div class="meta">Enrolment</div>
+        <div class="stat" id="statLearners">—</div>
+        <h3 style="margin-top:6px;">Learners</h3>
+      </div>
+      <div class="card">
+        <div class="meta">Staffing</div>
+        <div class="stat" id="statTeachers">—</div>
+        <h3 style="margin-top:6px;">Teachers</h3>
+      </div>
+      <div class="card">
+        <div class="meta">This term</div>
+        <div class="stat">6</div>
+        <h3 style="margin-top:6px;">Subjects offered</h3>
+      </div>
+      <div class="card">
+        <div class="meta">Pending</div>
+        <div class="stat" id="statResets">—</div>
+        <h3 style="margin-top:6px;">Password reset requests</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-users" style="display:none;">
+    <div class="grid">
+      <div class="card">
+        <span class="pill soon">Phase 2</span>
+        <h3 style="margin-top:8px;">Create &amp; manage accounts</h3>
+        <div class="meta">Add teachers, parents and learners; assign classes; enable/disable access; reset passwords from reset requests below.</div>
+      </div>
+      <div class="card">
+        <span class="pill live">Live</span>
+        <h3 style="margin-top:8px;">Password reset requests</h3>
+        <div class="meta">Requests submitted from the login page appear here for the admin to action.</div>
+        <div id="resetList" style="margin-top:10px; font-size:0.85rem;">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-academic" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 2</span><h3 style="margin-top:8px;">Classes &amp; class teachers</h3><div class="meta">One class teacher per class, teaching all six subjects for that grade.</div></div>
+      <div class="card"><span class="pill soon">Phase 2</span><h3 style="margin-top:8px;">Subjects</h3><div class="meta">Mathematics · English · Indigenous Language · Social Science · Science &amp; Technology · PE and Arts</div></div>
+      <div class="card"><span class="pill soon">Phase 2</span><h3 style="margin-top:8px;">Timetables</h3><div class="meta">Build and publish weekly timetables per class.</div></div>
+      <div class="card"><span class="pill soon">Phase 4</span><h3 style="margin-top:8px;">Schemes &amp; lesson plans</h3><div class="meta">Scheme of work, scheme-cum, and daily lesson plans — Heritage-Based Curriculum aligned.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-results" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Publish end-of-term results</h3><div class="meta">Admin approves and publishes results; learners and parents see them on login once released.</div></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Auto grading &amp; class positions</h3><div class="meta">Automatic marks-to-grade conversion and class/grade ranking per subject and overall.</div></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Report cards</h3><div class="meta">Generated per learner per term, downloadable.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-attendance" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 5</span><h3 style="margin-top:8px;">Attendance registers</h3><div class="meta">Daily class registers kept by each class teacher, visible to admin school-wide.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-fees" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 5</span><h3 style="margin-top:8px;">Fees &amp; receipts</h3><div class="meta">Record payments, issue receipts, send balance alerts to parents.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-documents" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 5</span><h3 style="margin-top:8px;">School document storage</h3><div class="meta">Circulars, policies and forms stored centrally in the cloud.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-calendar" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 5</span><h3 style="margin-top:8px;">Term calendar</h3><div class="meta">Holidays, term dates and events, auto-updating.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-comms" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 6</span><h3 style="margin-top:8px;">Announcements &amp; messaging</h3><div class="meta">Admin-to-all, teacher-to-parent, and class-wide messaging.</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('admin', async (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Admin';
+    loadCounts();
+    loadResetRequests();
+  });
+
+  async function loadCounts() {
+    try {
+      const learners = await db.collection('users').where('role', '==', 'learner').get();
+      const teachers = await db.collection('users').where('role', '==', 'teacher').get();
+      const resets = await db.collection('passwordResetRequests').where('status', '==', 'pending').get();
+      document.getElementById('statLearners').textContent = learners.size;
+      document.getElementById('statTeachers').textContent = teachers.size;
+      document.getElementById('statResets').textContent = resets.size;
+    } catch (e) {
+      document.getElementById('statLearners').textContent = '0';
+      document.getElementById('statTeachers').textContent = '0';
+      document.getElementById('statResets').textContent = '0';
+    }
+  }
+
+  async function loadResetRequests() {
+    const el = document.getElementById('resetList');
+    try {
+      const snap = await db.collection('passwordResetRequests').where('status', '==', 'pending').limit(10).get();
+      if (snap.empty) { el.textContent = 'No pending requests.'; return; }
+      el.innerHTML = '';
+      snap.forEach(doc => {
+        const row = document.createElement('div');
+        row.style.cssText = 'padding:6px 0;border-bottom:1px solid var(--line);';
+        row.textContent = doc.data().email;
+        el.appendChild(row);
+      });
+    } catch (e) {
+      el.textContent = 'Could not load requests.';
+    }
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      document.getElementById('panel-' + tab.dataset.tab).style.display = 'block';
+    });
+  });
+</script>
+</body>
+</html>
