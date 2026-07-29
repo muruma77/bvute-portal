@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bvute Primary School — Portal</title>
+<link rel="icon" href="IMG-20260724-WA5314.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-hero">
+    <img src="IMG-20260724-WA5314.jpg" alt="Bvute Primary School crest" class="logo">
+    <h1>Bvute Primary School</h1>
+    <p>School Information Portal · Chivi District, Masvingo</p>
+  </div>
+
+  <div class="login-card" id="loginView">
+    <div class="role-select" id="roleSelect">
+      <button type="button" data-role="admin">Admin</button>
+      <button type="button" data-role="teacher">Teacher</button>
+      <button type="button" data-role="parent">Parent</button>
+      <button type="button" data-role="learner">Learner</button>
+    </div>
+
+    <label for="email">Email address</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+
+    <a href="#" class="forgot-link" id="showRecover">Forgot password?</a>
+
+    <button class="btn btn-primary btn-block" style="margin-top:18px;" id="loginBtn">Sign in</button>
+
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <div class="login-card" id="recoverView" style="display:none;">
+    <h3 style="margin-bottom:4px;">Reset your password</h3>
+    <p style="font-size:0.82rem; color:var(--slate); margin:0 0 4px;">
+      For security, passwords here are reset by the school admin — not by email link.
+      Submit your request below and the admin will set a new password for you.
+    </p>
+    <label for="recoverEmail">Your registered email</label>
+    <input type="email" id="recoverEmail" placeholder="you@example.com">
+    <button class="btn btn-gold btn-block" style="margin-top:18px;" id="sendRecoverBtn">Send request to admin</button>
+    <a href="#" class="forgot-link" id="backToLogin" style="text-align:center; margin-top:14px;">← Back to sign in</a>
+    <div class="error-msg" id="recoverMsg"></div>
+  </div>
+
+  <p class="login-footer">
+    LEAM Pvt Ltd Co · Powered by Bvute Primary School ICT<br>
+    Trouble signing in? Contact your school administrator.
+  </p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  let selectedRole = null;
+  const roleButtons = document.querySelectorAll('#roleSelect button');
+  roleButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      roleButtons.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedRole = btn.dataset.role;
+    });
+  });
+
+  const errorMsg = document.getElementById('errorMsg');
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    errorMsg.style.display = 'none';
+
+    if (!selectedRole) { showError('Select who you are signing in as (Admin, Teacher, Parent or Learner).'); return; }
+    if (!email || !password) { showError('Enter your email and password.'); return; }
+
+    const btn = document.getElementById('loginBtn');
+    btn.textContent = 'Signing in…';
+    btn.disabled = true;
+
+    loginUser(email, password, selectedRole, (msg) => {
+      showError(msg);
+      btn.textContent = 'Sign in';
+      btn.disabled = false;
+    });
+  });
+
+  const loginView = document.getElementById('loginView');
+  const recoverView = document.getElementById('recoverView');
+  document.getElementById('showRecover').addEventListener('click', (e) => {
+    e.preventDefault();
+    loginView.style.display = 'none';
+    recoverView.style.display = 'block';
+  });
+  document.getElementById('backToLogin').addEventListener('click', (e) => {
+    e.preventDefault();
+    recoverView.style.display = 'none';
+    loginView.style.display = 'block';
+  });
+
+  document.getElementById('sendRecoverBtn').addEventListener('click', () => {
+    const email = document.getElementById('recoverEmail').value.trim();
+    const recoverMsg = document.getElementById('recoverMsg');
+    recoverMsg.style.display = 'none';
+    if (!email) { recoverMsg.textContent = 'Enter your registered email.'; recoverMsg.style.display = 'block'; return; }
+
+    requestPasswordReset(email, () => {
+      recoverView.innerHTML = '<h3>Request sent</h3><p style="font-size:0.85rem;color:var(--slate);">The school admin has been notified and will reset your password shortly. You will be told your new password in person or via the school office.</p><a href="#" class="forgot-link" id="backToLogin2" style="text-align:center;">← Back to sign in</a>';
+      document.getElementById('backToLogin2').addEventListener('click', (e) => { e.preventDefault(); location.reload(); });
+    }, (msg) => {
+      recoverMsg.textContent = msg;
+      recoverMsg.style.display = 'block';
+    });
+  });
+</script>
+</body>
+</html>
