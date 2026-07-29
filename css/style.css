@@ -1,0 +1,199 @@
+/* =========================================================
+   BVUTE PRIMARY SCHOOL PORTAL — Design Tokens & Shared Styles
+   ========================================================= */
+
+:root {
+  --navy: #123A5C;
+  --school-blue: #4A87AD;
+  --sky: #E8F1F6;
+  --gold: #C99A2E;
+  --cream: #F8F6F0;
+  --white: #FFFFFF;
+  --ink: #223142;
+  --slate: #5B6B7C;
+  --line: #DCE3E8;
+  --success: #2F8B57;
+  --warning: #C97A2E;
+  --danger: #B8433A;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 18px rgba(18, 58, 92, 0.08);
+  --shadow-lift: 0 10px 30px rgba(18, 58, 92, 0.14);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  color: var(--navy);
+  font-weight: 600;
+  margin: 0 0 0.4em;
+}
+a { color: var(--school-blue); text-decoration: none; }
+button { font-family: var(--font-body); cursor: pointer; }
+img { max-width: 100%; display: block; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--navy);
+  color: var(--white);
+  padding: 10px 18px;
+  position: sticky; top: 0; z-index: 40;
+  box-shadow: var(--shadow);
+}
+.topbar .brand { display: flex; align-items: center; gap: 10px; }
+.topbar .brand img {
+  width: 42px; height: 42px; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--gold);
+}
+.topbar .brand-text { line-height: 1.15; }
+.topbar .brand-text .school-name {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 700; letter-spacing: 0.02em;
+}
+.topbar .brand-text .school-sub {
+  font-size: 0.68rem; color: var(--sky); opacity: 0.85; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.topbar .user-chip {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.08);
+  padding: 6px 12px; border-radius: 999px;
+  font-size: 0.85rem;
+}
+.role-badge {
+  background: var(--gold); color: var(--navy);
+  font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 2px 9px; border-radius: 999px;
+}
+.logout-btn {
+  background: transparent; border: 1px solid rgba(255,255,255,0.35);
+  color: var(--white); padding: 6px 12px; border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+.logout-btn:hover { background: rgba(255,255,255,0.12); }
+
+.shell { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+
+.tabs {
+  display: flex; gap: 8px; overflow-x: auto;
+  padding: 4px 0 14px; margin-bottom: 6px;
+  -ms-overflow-style: none; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 0 0 auto;
+  background: var(--white); border: 1px solid var(--line);
+  color: var(--slate); font-size: 0.82rem; font-weight: 600;
+  padding: 8px 14px; border-radius: 999px; white-space: nowrap;
+}
+.tab.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 16px;
+  box-shadow: var(--shadow);
+}
+.card h3 { font-size: 1rem; margin-bottom: 6px; }
+.card .meta { font-size: 0.78rem; color: var(--slate); margin-bottom: 10px; }
+.card .stat { font-family: var(--font-display); font-size: 1.7rem; color: var(--school-blue); }
+.pill {
+  display: inline-block; font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 3px 9px; border-radius: 999px;
+}
+.pill.live { background: #E4F3EA; color: var(--success); }
+.pill.soon { background: #FCEFDF; color: var(--warning); }
+
+.btn {
+  display: inline-block; border: none; border-radius: var(--radius-sm);
+  padding: 11px 18px; font-weight: 600; font-size: 0.9rem;
+}
+.btn-primary { background: var(--school-blue); color: var(--white); }
+.btn-primary:hover { background: var(--navy); }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-outline { background: transparent; border: 1px solid var(--school-blue); color: var(--school-blue); }
+.btn-block { width: 100%; text-align: center; }
+
+.login-wrap {
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+.login-hero {
+  background: linear-gradient(160deg, var(--navy) 0%, #1C4A72 100%);
+  color: var(--white); padding: 40px 24px 34px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.login-hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 80% -10%, rgba(201,154,46,0.25), transparent 55%);
+}
+.login-hero img.logo {
+  width: 92px; height: 92px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--gold); margin: 0 auto 14px;
+  position: relative; z-index: 1;
+}
+.login-hero h1 { color: var(--white); font-size: 1.4rem; position: relative; z-index: 1; }
+.login-hero p { color: var(--sky); font-size: 0.85rem; margin: 6px 0 0; position: relative; z-index: 1; }
+.login-card {
+  background: var(--white); margin: -26px 16px 0; padding: 26px 22px;
+  border-radius: var(--radius); box-shadow: var(--shadow-lift);
+  position: relative; z-index: 2;
+}
+.login-card label {
+  display: block; font-size: 0.78rem; font-weight: 600;
+  color: var(--slate); margin: 14px 0 6px;
+}
+.login-card input, .login-card select {
+  width: 100%; padding: 12px 13px; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); font-size: 0.95rem; font-family: var(--font-body);
+  background: var(--cream);
+}
+.login-card input:focus, .login-card select:focus, .tab:focus-visible, .btn:focus-visible {
+  outline: 3px solid rgba(74,135,173,0.45); outline-offset: 1px;
+}
+.role-select {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px;
+}
+.role-select button {
+  border: 1.5px solid var(--line); background: var(--white);
+  border-radius: var(--radius-sm); padding: 10px 4px;
+  font-size: 0.72rem; font-weight: 600; color: var(--slate);
+}
+.role-select button.selected {
+  border-color: var(--school-blue); background: var(--sky); color: var(--navy);
+}
+.error-msg {
+  background: #FBEAE8; color: var(--danger); border: 1px solid #F0C9C4;
+  padding: 10px 12px; border-radius: var(--radius-sm); font-size: 0.82rem; margin-top: 14px;
+  display: none;
+}
+.login-footer {
+  text-align: center; font-size: 0.72rem; color: var(--slate);
+  margin: 22px auto 0; padding: 0 20px;
+}
+.forgot-link { display: block; text-align: right; font-size: 0.78rem; margin-top: 8px; }
+
+.empty-state {
+  text-align: center; padding: 50px 20px; color: var(--slate);
+}
+.empty-state .icon { font-size: 2rem; margin-bottom: 8px; }
+
+@media (min-width: 640px) {
+  .login-wrap { align-items: center; }
+  .login-card { max-width: 420px; margin: -26px auto 0; }
+  .login-hero { padding-top: 56px; }
+}
