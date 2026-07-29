@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Dashboard — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub" id="classLabel">Teacher</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Teacher</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">My Class</button>
+    <button class="tab" data-tab="registers">Attendance</button>
+    <button class="tab" data-tab="results">Tests &amp; Results</button>
+    <button class="tab" data-tab="records">Record Books</button>
+    <button class="tab" data-tab="planning">Schemes &amp; Lesson Plans</button>
+    <button class="tab" data-tab="comms">Messages</button>
+  </div>
+
+  <div class="panel" id="panel-overview">
+    <div class="grid">
+      <div class="card"><div class="meta">Assigned class</div><h3 id="assignedClass">—</h3><div class="meta">All six subjects taught by you this year, per the Zimbabwe primary model.</div></div>
+      <div class="card"><span class="pill live">Live</span><h3 style="margin-top:8px;">Subjects you teach</h3><div class="meta">Mathematics · English · Indigenous Language · Social Science · Science &amp; Technology · PE and Arts</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-registers" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 5</span><h3 style="margin-top:8px;">Daily attendance register</h3><div class="meta">Mark your class present/absent/late each day.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-results" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Enter end-of-term test marks</h3><div class="meta">Per subject, per learner. Sent to admin for approval before publishing.</div></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Auto grading preview</h3><div class="meta">See grades and class positions calculate automatically as you enter marks.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-records" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Reading Record Book</h3></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Remedial Record Book</h3></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Extension Record Book</h3></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Progress Record Book</h3></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Test Record Book</h3></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Inventory Record Book</h3></div>
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">Child Study Record Book</h3></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-planning" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 4</span><h3 style="margin-top:8px;">Scheme of Work</h3><div class="meta">Termly, Heritage-Based Curriculum aligned.</div></div>
+      <div class="card"><span class="pill soon">Phase 4</span><h3 style="margin-top:8px;">Scheme-cum</h3></div>
+      <div class="card"><span class="pill soon">Phase 4</span><h3 style="margin-top:8px;">Detailed Daily Lesson Plans</h3></div>
+      <div class="card"><span class="pill soon">Phase 4</span><h3 style="margin-top:8px;">Holiday work setting</h3></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-comms" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 6</span><h3 style="margin-top:8px;">Message parents</h3><div class="meta">Send updates to parents of learners in your class.</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('teacher', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Teacher';
+    const cls = userData.assignedClass || 'No class assigned yet';
+    document.getElementById('classLabel').textContent = cls;
+    document.getElementById('assignedClass').textContent = cls;
+  });
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      document.getElementById('panel-' + tab.dataset.tab).style.display = 'block';
+    });
+  });
+</script>
+</body>
+</html>
