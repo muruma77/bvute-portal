@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learner Dashboard — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">My Portal</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Learner</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">My Class</button>
+    <button class="tab" data-tab="results">My Results</button>
+    <button class="tab" data-tab="homework">Holiday Work</button>
+    <button class="tab" data-tab="timetable">Timetable</button>
+  </div>
+
+  <div class="panel" id="panel-overview">
+    <div class="grid">
+      <div class="card"><div class="meta">Class</div><h3 id="myClass">—</h3></div>
+      <div class="card"><span class="pill live">Live</span><h3 style="margin-top:8px;">My subjects</h3><div class="meta">Mathematics · English · Indigenous Language · Social Science · Science &amp; Technology · PE and Arts</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-results" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 3</span><h3 style="margin-top:8px;">End-of-term results</h3><div class="meta">Your marks, grades and position will show here once the admin publishes them.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-homework" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 4</span><h3 style="margin-top:8px;">Holiday work</h3><div class="meta">Set by your teacher for the holidays.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-timetable" style="display:none;">
+    <div class="grid">
+      <div class="card"><span class="pill soon">Phase 2</span><h3 style="margin-top:8px;">Class timetable</h3></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('learner', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Learner';
+    document.getElementById('myClass').textContent = userData.assignedClass || 'Not assigned yet';
+  });
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      document.getElementById('panel-' + tab.dataset.tab).style.display = 'block';
+    });
+  });
+</script>
+</body>
+    </html>
