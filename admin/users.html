@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Access — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">Admin Console</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Admin</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <a href="dashboard.html" style="font-size:0.82rem;">← Back to dashboard</a>
+
+  <div class="tabs" style="margin-top:14px;">
+    <button class="tab active" data-tab="add">Add Account</button>
+    <button class="tab" data-tab="manage">Manage Accounts</button>
+    <button class="tab" data-tab="resets">Reset Requests</button>
+  </div>
+
+  <div class="panel" id="panel-add">
+    <div class="form-card">
+      <h3>Create a new account</h3>
+      <div class="field-hint" style="margin-bottom:6px;">All fields can be changed later from Manage Accounts.</div>
+
+      <div class="field-row two">
+        <div class="field">
+          <label>Role</label>
+          <select id="fRole">
+            <option value="teacher">Teacher</option>
+            <option value="parent">Parent</option>
+            <option value="learner">Learner</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="fStatus">
+            <option value="active">Active</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row two">
+        <div class="field">
+          <label>Full name</label>
+          <input type="text" id="fFullName" placeholder="e.g. Tafadzwa Moyo">
+        </div>
+        <div class="field" id="fClassWrap">
+          <label id="fClassLabel">Class</label>
+          <select id="fClass">
+            <option value="">— Not assigned —</option>
+            <option>ECD A</option>
+            <option>ECD B</option>
+            <option>Grade 1</option>
+            <option>Grade 2</option>
+            <option>Grade 3</option>
+            <option>Grade 4</option>
+            <option>Grade 5</option>
+            <option>Grade 6</option>
+            <option>Grade 7</option>
+          </select>
+          <div class="field-hint">Teacher = class they teach. Learner = class they're in.</div>
+        </div>
+      </div>
+
+      <div class="field-row two" id="parentFields" style="display:none;">
+        <div class="field">
+          <label>Child's full name</label>
+          <input type="text" id="fChildName" placeholder="e.g. Tanaka Moyo">
+        </div>
+        <div class="field">
+          <label>Child's class</label>
+          <select id="fChildClass">
+            <option value="">— Select —</option>
+            <option>ECD A</option>
+            <option>ECD B</option>
+            <option>Grade 1</option>
+            <option>Grade 2</option>
+            <option>Grade 3</option>
+            <option>Grade 4</option>
+            <option>Grade 5</option>
+            <option>Grade 6</option>
+            <option>Grade 7</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row two">
+        <div class="field">
+          <label>Login email</label>
+          <input type="email" id="fEmail" placeholder="name@example.com">
+        </div>
+        <div class="field">
+          <label>Temporary password</label>
+          <input type="text" id="fPassword" placeholder="At least 6 characters">
+          <div class="field-hint">Share this with them directly. They can request a change later via "Forgot password".</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:18px;" id="createBtn">Create account</button>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-manage" style="display:none;">
+    <div class="panel-header">
+      <h3 style="margin:0;">All accounts</h3>
+      <select id="filterRole" style="padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--white);">
+        <option value="">All roles</option>
+        <option value="admin">Admin</option>
+        <option value="teacher">Teacher</option>
+        <option value="parent">Parent</option>
+        <option value="learner">Learner</option>
+      </select>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Role</th><th>Class</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="userTableBody">
+          <tr><td colspan="5" style="text-align:center; padding:20px;">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-resets" style="display:none;">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Email</th><th>Requested</th><th>Actions</th></tr></thead>
+        <tbody id="resetTableBody">
+          <tr><td colspan="3" style="text-align:center; padding:20px;">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="field-hint" style="margin-top:12px;">
+      To actually change a password, open Firebase Console → Authentication → Users → tap the account → Reset password. Then tap "Mark done" here.
+    </p>
+  </div>
+</div>
+
+<div class="shell" id="editWrap" style="display:none;">
+  <div class="form-card">
+    <h3>Edit account</h3>
+    <div class="field-row two">
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="eFullName">
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <select id="eRole">
+          <option value="teacher">Teacher</option>
+          <option value="parent">Parent</option>
+          <option value="learner">Learner</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row two">
+      <div class="field">
+        <label>Class</label>
+        <select id="eClass">
+          <option value="">— Not assigned —</option>
+          <option>ECD A</option><option>ECD B</option>
+          <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+          <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="eStatus">
+          <option value="active">Active</option>
+          <option value="disabled">Disabled</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary" id="saveEditBtn">Save changes</button>
+      <button class="btn btn-outline" id="cancelEditBtn" style="margin-left:8px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('admin', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Admin';
+    loadUsers();
+    loadResets();
+  });
+
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.style.display = 'block';
+    setTimeout(() => (t.style.display = 'none'), 3500);
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      document.getElementById('panel-' + tab.dataset.tab).style.display = 'block';
+      document.getElementById('editWrap').style.display = 'none';
+    });
+  });
+
+  const fRole = document.getElementById('fRole');
+  const fClassWrap = document.getElementById('fClassWrap');
+  const parentFields = document.getElementById('parentFields');
+  function updateFormFields() {
+    const role = fRole.value;
+    parentFields.style.display = role === 'parent' ? 'grid' : 'none';
+    fClassWrap.style.display = (role === 'teacher' || role === 'learner') ? 'block' : 'none';
+    document.getElementById('fClassLabel').textContent = role === 'teacher' ? 'Class they teach' : 'Class';
+  }
+  fRole.addEventListener('change', updateFormFields);
+  updateFormFields();
+
+  document.getElementById('createBtn').addEventListener('click', async () => {
+    const role = fRole.value;
+    const status = document.getElementById('fStatus').value;
+    const fullName = document.getElementById('fFullName').value.trim();
+    const cls = document.getElementById('fClass').value;
+    const email = document.getElementById('fEmail').value.trim();
+    const password = document.getElementById('fPassword').value;
+    const childName = document.getElementById('fChildName').value.trim();
+    const childClass = document.getElementById('fChildClass').value;
+
+    if (!fullName || !email || !password) {
+      showToast('Fill in full name, email and a temporary password.', true);
+      return;
+    }
+    if (password.length < 6) {
+      showToast('Password must be at least 6 characters.', true);
+      return;
+    }
+
+    const btn = document.getElementById('createBtn');
+    btn.disabled = true; btn.textContent = 'Creating…';
+
+    let secondaryApp;
+    try {
+      secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary-' + Date.now());
+      const secondaryAuth = secondaryApp.auth();
+      const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+      const uid = cred.user.uid;
+      await secondaryAuth.signOut();
+
+      const profile = { role, fullName, status };
+      if (role === 'teacher' || role === 'learner') profile.assignedClass = cls;
+      if (role === 'parent') { profile.childName = childName; profile.childClass = childClass; }
+
+      await db.collection('users').doc(uid).set(profile);
+      await secondaryApp.delete();
+
+      showToast(fullName + ' added as ' + role + '.');
+      document.getElementById('fFullName').value = '';
+      document.getElementById('fEmail').value = '';
+      document.getElementById('fPassword').value = '';
+      document.getElementById('fChildName').value = '';
+      loadUsers();
+    } catch (err) {
+      const map = {
+        'auth/email-already-in-use': 'That email is already registered.',
+        'auth/invalid-email': 'That email address doesn\'t look right.',
+        'auth/weak-password': 'Password is too weak — use at least 6 characters.'
+      };
+      showToast(map[err.code] || 'Could not create account. Try again.', true);
+      if (secondaryApp) { try { await secondaryApp.delete(); } catch(e) {} }
+    } finally {
+      btn.disabled = false; btn.textContent = 'Create account';
+    }
+  });
+
+  let allUsers = [];
+  async function loadUsers() {
+    const tbody = document.getElementById('userTableBody');
+    try {
+      const snap = await db.collection('users').get();
+      allUsers = [];
+      snap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
+      renderUsers();
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Could not load accounts.</td></tr>';
+    }
+  }
+
+  function renderUsers() {
+    const tbody = document.getElementById('userTableBody');
+    const filter = document.getElementById('filterRole').value;
+    const rows = allUsers.filter(u => !filter || u.role === filter);
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No accounts found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    rows.forEach(u => {
+      const tr = document.createElement('tr');
+      const cls = u.assignedClass || (u.childClass ? ('Child: ' + u.childClass) : '—');
+      tr.innerHTML = `
+        <td>${escapeHtml(u.fullName || '—')}</td>
+        <td style="text-transform:capitalize;">${escapeHtml(u.role || '—')}</td>
+        <td>${escapeHtml(cls)}</td>
+        <td><span class="status-dot ${u.status === 'disabled' ? 'disabled' : 'active'}"></span>${u.status === 'disabled' ? 'Disabled' : 'Active'}</td>
+        <td>
+          <button class="icon-btn" onclick="openEdit('${u.id}')">Edit</button>
+          <button class="icon-btn ${u.status === 'disabled' ? '' : 'danger'}" onclick="toggleStatus('${u.id}','${u.status}')">${u.status === 'disabled' ? 'Enable' : 'Disable'}</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+
+  document.getElementById('filterRole').addEventListener('change', renderUsers);
+
+  async function toggleStatus(uid, currentStatus) {
+    const newStatus = currentStatus === 'disabled' ? 'active' : 'disabled';
+    try {
+      await db.collection('users').doc(uid).update({ status: newStatus });
+      showToast('Status updated.');
+      loadUsers();
+    } catch (e) {
+      showToast('Could not update status.', true);
+    }
+  }
+
+  let editingId = null;
+  function openEdit(uid) {
+    const u = allUsers.find(x => x.id === uid);
+    if (!u) return;
+    editingId = uid;
+    document.getElementById('eFullName').value = u.fullName || '';
+    document.getElementById('eRole').value = u.role || 'learner';
+    document.getElementById('eClass').value = u.assignedClass || '';
+    document.getElementById('eStatus').value = u.status || 'active';
+    document.getElementById('editWrap').style.display = 'block';
+    document.getElementById('editWrap').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('cancelEditBtn').addEventListener('click', () => {
+    document.getElementById('editWrap').style.display = 'none';
+    editingId = null;
+  });
+
+  document.getElementById('saveEditBtn').addEventListener('click', async () => {
+    if (!editingId) return;
+    const updates = {
+      fullName: document.getElementById('eFullName').value.trim(),
+      role: document.getElementById('eRole').value,
+      status: document.getElementById('eStatus').value,
+      assignedClass: document.getElementById('eClass').value
+    };
+    try {
+      await db.collection('users').doc(editingId).update(updates);
+      showToast('Account updated.');
+      document.getElementById('editWrap').style.display = 'none';
+      editingId = null;
+      loadUsers();
+    } catch (e) {
+      showToast('Could not save changes.', true);
+    }
+  });
+
+  async function loadResets() {
+    const tbody = document.getElementById('resetTableBody');
+    try {
+      const snap = await db.collection('passwordResetRequests').where('status', '==', 'pending').get();
+      if (snap.empty) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">No pending requests.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const when = d.requestedAt && d.requestedAt.toDate ? d.requestedAt.toDate().toLocaleString() : '—';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${escapeHtml(d.email)}</td><td>${when}</td><td><button class="icon-btn" onclick="resolveReset('${doc.id}')">Mark done</button></td>`;
+        tbody.appendChild(tr);
+      });
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Could not load requests.</td></tr>';
+    }
+  }
+
+  async function resolveReset(id) {
+    try {
+      await db.collection('passwordResetRequests').doc(id).update({ status: 'resolved' });
+      showToast('Marked as done.');
+      loadResets();
+    } catch (e) {
+      showToast('Could not update request.', true);
+    }
+  }
+</script>
+</body>
+                                             </html>
