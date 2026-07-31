@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timetables — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .tt-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  .tt-table th, .tt-table td { border: 1px solid var(--line); padding: 4px; text-align: center; }
+  .tt-table th { background: var(--sky); color: var(--navy); font-size: 0.68rem; text-transform: uppercase; }
+  .tt-table td:first-child, .tt-table th:first-child { background: var(--cream); font-weight: 600; white-space: nowrap; }
+  .tt-table select { width: 100%; border: none; background: transparent; font-size: 0.74rem; padding: 4px 2px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">Admin Console</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Admin</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <a href="dashboard.html" style="font-size:0.82rem;">← Back to dashboard</a>
+
+  <div class="form-card" style="margin-top:14px;">
+    <h3>Build a class timetable</h3>
+    <div class="field" style="max-width:280px;">
+      <label>Select class</label>
+      <select id="classSelect">
+        <option value="">— Choose a class —</option>
+        <option>ECD A</option><option>ECD B</option>
+        <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+        <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="ttWrap" style="display:none;">
+    <div class="data-table-wrap" style="padding:10px; overflow-x:auto;">
+      <table class="tt-table" id="ttTable">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th>
+          </tr>
+        </thead>
+        <tbody id="ttBody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary" style="margin-top:14px;" id="saveTtBtn">Save timetable</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('admin', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Admin';
+  });
+
+  const SUBJECTS = ['—', 'Mathematics', 'English', 'Indigenous Language', 'Social Science', 'Science & Technology', 'PE and Arts', 'Break', 'Assembly'];
+  const PERIODS = ['Period 1', 'Period 2', 'Period 3', 'Break', 'Period 4', 'Period 5', 'Period 6'];
+  const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri'];
+
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.style.display = 'block';
+    setTimeout(() => (t.style.display = 'none'), 3500);
+  }
+
+  function buildGrid(existing) {
+    const tbody = document.getElementById('ttBody');
+    tbody.innerHTML = '';
+    PERIODS.forEach((period, pIdx) => {
+      const tr = document.createElement('tr');
+      let rowHtml = `<td>${period}</td>`;
+      DAYS.forEach(day => {
+        const key = day + '_' + pIdx;
+        const saved = existing && existing[key] ? existing[key] : '—';
+        let options = SUBJECTS.map(s => `<option ${s === saved ? 'selected' : ''}>${s}</option>`).join('');
+        rowHtml += `<td><select data-key="${key}">${options}</select></td>`;
+      });
+      tr.innerHTML = rowHtml;
+      tbody.appendChild(tr);
+    });
+  }
+
+  const classSelect = document.getElementById('classSelect');
+  let currentClass = null;
+
+  classSelect.addEventListener('change', async () => {
+    currentClass = classSelect.value;
+    if (!currentClass) { document.getElementById('ttWrap').style.display = 'none'; return; }
+    document.getElementById('ttWrap').style.display = 'block';
+    try {
+      const doc = await db.collection('timetables').doc(currentClass).get();
+      buildGrid(doc.exists ? doc.data() : null);
+    } catch (e) {
+      buildGrid(null);
+      showToast('Could not load existing timetable, starting blank.', true);
+    }
+  });
+
+  document.getElementById('saveTtBtn').addEventListener('click', async () => {
+    if (!currentClass) return;
+    const data = {};
+    document.querySelectorAll('#ttBody select').forEach(sel => {
+      data[sel.dataset.key] = sel.value;
+    });
+    try {
+      await db.collection('timetables').doc(currentClass).set(data);
+      showToast('Timetable saved for ' + currentClass + '.');
+    } catch (e) {
+      showToast('Could not save timetable.', true);
+    }
+  });
+</script>
+</body>
+</html>
