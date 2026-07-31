@@ -53,8 +53,11 @@
   </div>
 
   <div class="panel" id="panel-timetable" style="display:none;">
-    <div class="grid">
-      <div class="card"><span class="pill soon">Phase 2</span><h3 style="margin-top:8px;">Class timetable</h3></div>
+    <div class="data-table-wrap" style="padding:10px; overflow-x:auto;">
+      <table class="data-table" id="ttTable" style="font-size:0.78rem;">
+        <thead><tr><th>Period</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead>
+        <tbody id="ttBody"><tr><td colspan="6" style="text-align:center; padding:16px;">Loading…</td></tr></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -69,7 +72,34 @@
   guardPage('learner', (userData) => {
     document.getElementById('userName').textContent = userData.fullName || 'Learner';
     document.getElementById('myClass').textContent = userData.assignedClass || 'Not assigned yet';
+    if (userData.assignedClass) loadTimetable(userData.assignedClass);
+    else document.getElementById('ttBody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:16px;">Ask admin to assign you to a class first.</td></tr>';
   });
+
+  const PERIOD_LABELS = ['Period 1', 'Period 2', 'Period 3', 'Break', 'Period 4', 'Period 5', 'Period 6'];
+  const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri'];
+
+  async function loadTimetable(className) {
+    const tbody = document.getElementById('ttBody');
+    try {
+      const doc = await db.collection('timetables').doc(className).get();
+      if (!doc.exists) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:16px;">No timetable published yet for ' + className + '.</td></tr>'; return; }
+      const data = doc.data();
+      tbody.innerHTML = '';
+      PERIOD_LABELS.forEach((label, pIdx) => {
+        const tr = document.createElement('tr');
+        let row = `<td style="font-weight:600;">${label}</td>`;
+        DAY_KEYS.forEach(day => {
+          const val = data[day + '_' + pIdx] || '—';
+          row += `<td>${val}</td>`;
+        });
+        tr.innerHTML = row;
+        tbody.appendChild(tr);
+      });
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:16px;">Could not load timetable.</td></tr>';
+    }
+  }
 
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -81,4 +111,4 @@
   });
 </script>
 </body>
-    </html>
+</html>
