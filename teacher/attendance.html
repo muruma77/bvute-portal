@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .att-btns { display: flex; gap: 6px; }
+  .att-btn { flex: 1; border: 1px solid var(--line); background: var(--white); border-radius: 8px; padding: 8px 4px; font-size: 0.75rem; font-weight: 600; color: var(--slate); }
+  .att-btn.present.selected { background: #E4F3EA; border-color: var(--success); color: var(--success); }
+  .att-btn.late.selected { background: #FCEFDF; border-color: var(--warning); color: var(--warning); }
+  .att-btn.absent.selected { background: #FBEAE8; border-color: var(--danger); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">Teacher</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Teacher</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <a href="dashboard.html" style="font-size:0.82rem;">← Back to dashboard</a>
+
+  <div class="form-card" style="margin-top:14px;">
+    <h3>Daily attendance register</h3>
+    <div id="noClassMsg" style="display:none;" class="field-hint">You don't have a class assigned yet — ask the admin.</div>
+    <div class="field" id="dateField" style="max-width:220px; display:none;">
+      <label>Date</label>
+      <input type="date" id="attDate">
+    </div>
+  </div>
+
+  <div id="attWrap" style="display:none;">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Learner</th><th>Status</th></tr></thead>
+        <tbody id="attBody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary" style="margin-top:14px;" id="saveAttBtn">Save register</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  let myClassName = null;
+
+  guardPage('teacher', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Teacher';
+    myClassName = userData.assignedClass || null;
+    if (!myClassName) {
+      document.getElementById('noClassMsg').style.display = 'block';
+      return;
+    }
+    const dateField = document.getElementById('dateField');
+    dateField.style.display = 'block';
+    const dateInput = document.getElementById('attDate');
+    dateInput.value = new Date().toISOString().slice(0, 10);
+    dateInput.addEventListener('change', loadRegister);
+    loadRegister();
+  });
+
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.style.display = 'block';
+    setTimeout(() => (t.style.display = 'none'), 3500);
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+
+  async function loadRegister() {
+    const date = document.getElementById('attDate').value;
+    const wrap = document.getElementById('attWrap');
+    const body = document.getElementById('attBody');
+    wrap.style.display = 'block';
+    body.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:16px;">Loading…</td></tr>';
+
+    try {
+      const learnersSnap = await db.collection('users').where('role', '==', 'learner').where('assignedClass', '==', myClassName).get();
+      const learners = [];
+      learnersSnap.forEach(doc => learners.push({ id: doc.id, fullName: doc.data().fullName || 'Unnamed' }));
+
+      if (learners.length === 0) {
+        body.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:16px;">No learners in your class yet.</td></tr>';
+        return;
+      }
+
+      const docId = myClassName + '_' + date;
+      let existing = {};
+      try {
+        const doc = await db.collection('attendance').doc(docId).get();
+        if (doc.exists) existing = doc.data().records || {};
+      } catch (e) {}
+
+      body.innerHTML = '';
+      learners.forEach(l => {
+        const status = existing[l.id] || 'present';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(l.fullName)}</td>
+          <td>
+            <div class="att-btns" data-uid="${l.id}">
+              <button type="button" class="att-btn present ${status === 'present' ? 'selected' : ''}" data-status="present">Present</button>
+              <button type="button" class="att-btn late ${status === 'late' ? 'selected' : ''}" data-status="late">Late</button>
+              <button type="button" class="att-btn absent ${status === 'absent' ? 'selected' : ''}" data-status="absent">Absent</button>
+            </div>
+          </td>`;
+        body.appendChild(tr);
+      });
+
+      document.querySelectorAll('.att-btns').forEach(group => {
+        group.querySelectorAll('.att-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            group.querySelectorAll('.att-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+          });
+        });
+      });
+    } catch (e) {
+      body.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:16px;">Could not load register.</td></tr>';
+    }
+  }
+
+  document.getElementById('saveAttBtn').addEventListener('click', async () => {
+    const date = document.getElementById('attDate').value;
+    const records = {};
+    document.querySelectorAll('.att-btns').forEach(group => {
+      const selected = group.querySelector('.att-btn.selected');
+      records[group.dataset.uid] = selected ? selected.dataset.status : 'present';
+    });
+    const docId = myClassName + '_' + date;
+    try {
+      await db.collection('attendance').doc(docId).set({
+        className: myClassName, date, records
+      });
+      showToast('Register saved for ' + date + '.');
+    } catch (e) {
+      showToast('Could not save register.', true);
+    }
+  });
+</script>
+</body>
+</html>
