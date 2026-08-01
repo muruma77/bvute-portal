@@ -2,7 +2,7 @@
 // BVUTE PORTAL - Firebase Authentication
 // ============================================
 
-// Firebase Config (REPLACE WITH YOUR ACTUAL CONFIG)
+// ⚠️ IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -107,6 +107,8 @@ loginForm.addEventListener('submit', async (e) => {
         if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
         if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
         if (error.code === 'auth/too-many-requests') msg = 'Too many failed attempts. Try later.';
+        if (error.code === 'auth/invalid-email') msg = 'Invalid email format.';
+        if (error.code === 'auth/network-request-failed') msg = 'Network error. Check your internet connection.';
         showAlert(msg, 'danger');
         loginBtn.disabled = false;
         loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
@@ -144,8 +146,8 @@ document.getElementById('resetRequestBtn').addEventListener('click', async () =>
 
 // --- Admin: Approve Resets (Hidden feature) ---
 document.getElementById('resetApprovalBtn').addEventListener('click', async () => {
-    // This is a placeholder for the admin panel feature.
     alert('Go to Admin Dashboard -> Settings -> Password Reset Approvals.');
 });
 
-// Auto-show admin approval button if logged in as admin? (handled on dashboard)
+console.log('✅ Firebase Auth loaded successfully.');
+console.log('📌 BVUTE Primary School Portal ready.');
