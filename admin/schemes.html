@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bvute Admin - Schemes & Lesson Plans</title>
+    <link rel="icon" href="../IMG-20260724-WA5314" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .main-content {
+            flex: 1;
+            padding: 24px 32px 40px 32px;
+            overflow-y: auto;
+            margin-left: 260px;
+            background: #f4f7fc;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9edf4;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topbar h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0b1a33;
+        }
+
+        .topbar h1 span {
+            font-weight: 400;
+            font-size: 14px;
+            color: #6b7a8f;
+            margin-left: 10px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .topbar-actions .admin-badge {
+            background: #eef3fe;
+            color: #2a6df4;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .topbar-actions .logout-btn {
+            background: #fee;
+            color: #d1453b;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .topbar-actions .logout-btn:hover {
+            background: #fdd;
+        }
+
+        .panel-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            margin-bottom: 28px;
+        }
+
+        .panel-card .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b1a33;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-card .card-title i {
+            color: #2a6df4;
+        }
+
+        .btn-primary {
+            background: #2a6df4;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #1a5adf;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(42,109,244,0.25);
+        }
+
+        .btn-success {
+            background: #0f973d;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-success:hover {
+            background: #0d7f33;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-warning:hover {
+            background: #d68910;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table thead {
+            background: #f8fafd;
+        }
+
+        table thead th {
+            text-align: left;
+            padding: 14px 16px;
+            font-weight: 600;
+            color: #1e2a3a;
+            border-bottom: 2px solid #e9edf4;
+            white-space: nowrap;
+        }
+
+        table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #edf2f7;
+            color: #1e2a3a;
+        }
+
+        table tbody tr:hover {
+            background: #f8faff;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.active {
+            background: #e6f7ed;
+            color: #0f973d;
+        }
+
+        .status-badge.inactive {
+            background: #fde8e5;
+            color: #d1453b;
+        }
+
+        .status-badge.pending {
+            background: #fff3d6;
+            color: #b47d2a;
+        }
+
+        .action-icons i {
+            margin: 0 6px;
+            cursor: pointer;
+            color: #6b7a8f;
+            transition: 0.2s;
+            font-size: 15px;
+        }
+
+        .action-icons i:hover {
+            color: #2a6df4;
+            transform: scale(1.1);
+        }
+
+        .action-icons i.fa-trash:hover {
+            color: #e74c3c;
+        }
+
+        .inline-flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .text-muted {
+            color: #6b7a8f;
+            font-size: 13px;
+        }
+
+        .scheme-type-badge {
+            background: #eef3fe;
+            color: #1a5adf;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .form-grid label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #34495e;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-grid input,
+        .form-grid select,
+        .form-grid textarea {
+            padding: 10px 14px;
+            border: 1px solid #dce3ec;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafcff;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .form-grid input:focus,
+        .form-grid select:focus,
+        .form-grid textarea:focus {
+            border-color: #2a6df4;
+            box-shadow: 0 0 0 3px rgba(42,109,244,0.12);
+        }
+
+        .form-grid textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid #e9edf4;
+            margin-bottom: 20px;
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #6b7a8f;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
+            border-radius: 0;
+        }
+
+        .tab-btn:hover {
+            color: #0b1a33;
+        }
+
+        .tab-btn.active {
+            color: #2a6df4;
+            border-bottom-color: #2a6df4;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 70px;
+                padding: 16px;
+            }
+            .topbar h1 {
+                font-size: 18px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="../IMG-20260724-WA5314" alt="Bvute Logo">
+            <div class="brand-text">
+                <div class="school-name">Bvute</div>
+                <div class="school-sub">Admin Panel</div>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="menu-label">Main</li>
+            <li><a href="dashboard.html"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+            <li><a href="students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+            <li><a href="teachers.html"><i class="fas fa-chalkboard-user"></i> <span>Teachers</span></a></li>
+            <li><a href="classes.html"><i class="fas fa-building-columns"></i> <span>Classes</span></a></li>
+            <li><a href="subjects.html"><i class="fas fa-book-open"></i> <span>Subjects</span></a></li>
+            <li><a href="results.html"><i class="fas fa-table"></i> <span>Results</span></a></li>
+            <li class="menu-label">Education 5.0</li>
+            <li><a href="schemes.html" class="active"><i class="fas fa-pen-fancy"></i> <span>Schemes & Plans</span></a></li>
+            <li><a href="record-books.html"><i class="fas fa-notebook"></i> <span>Record Books</span></a></li>
+            <li><a href="attendance.html"><i class="fas fa-clipboard-check"></i> <span>Attendance</span></a></li>
+            <li class="menu-label">Finance</li>
+            <li><a href="fees.html"><i class="fas fa-coins"></i> <span>Fees</span></a></li>
+            <li><a href="payments.html"><i class="fas fa-credit-card"></i> <span>Payments</span></a></li>
+            <li class="menu-label">System</li>
+            <li><a href="documents.html"><i class="fas fa-folder-open"></i> <span>Documents</span></a></li>
+            <li><a href="settings.html"><i class="fas fa-gear"></i> <span>Settings</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="../index.html"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <h1>📝 Schemes & Lesson Plans <span>Admin / Education 5.0</span></h1>
+            <div class="topbar-actions">
+                <span class="admin-badge"><i class="fas fa-shield-alt"></i> Admin</span>
+                <button class="logout-btn" onclick="window.location.href='../index.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="panel-card">
+            <div class="tab-bar">
+                <button class="tab-btn active" data-tab="scheme-cum">Scheme-Cum</button>
+                <button class="tab-btn" data-tab="lesson-plan">Detailed Lesson Plan</button>
+                <button class="tab-btn" data-tab="scheme-work">Scheme of Work</button>
+            </div>
+
+            <!-- ===== Tab 1: Scheme-Cum ===== -->
+            <div id="scheme-cum" class="tab-content active">
+                <div class="card-title"><i class="fas fa-book"></i> Scheme-Cum (Combined Scheme & Record)</div>
+                <div class="form-grid">
+                    <label>Class
+                        <select>
+                            <option>Form 3C</option>
+                            <option>Form 2B</option>
+                            <option>Grade 5</option>
+                            <option>Grade 1</option>
+                        </select>
+                    </label>
+                    <label>Subject
+                        <select>
+                            <option>Mathematics</option>
+                            <option>English</option>
+                            <option>Indigenous Language</option>
+                            <option>Social Science</option>
+                            <option>Science & Technology</option>
+                            <option>PE & Arts</option>
+                        </select>
+                    </label>
+                    <label>Term
+                        <select>
+                            <option>Term 1</option>
+                            <option>Term 2</option>
+                            <option selected>Term 3</option>
+                        </select>
+                    </label>
+                    <label>Year
+                        <select>
+                            <option>2025</option>
+                            <option selected>2026</option>
+                            <option>2027</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-grid">
+                    <label style="grid-column: span 2;">Topics Covered (comma-separated)
+                        <input type="text" placeholder="e.g. Number concepts, Addition, Subtraction">
+                    </label>
+                </div>
+                <div class="form-grid">
+                    <label style="grid-column: span 2;">Remarks / Progress Notes
+                        <textarea placeholder="Enter observations, learner progress, challenges..."></textarea>
+                    </label>
+                </div>
+                <button class="btn-success"><i class="fas fa-save"></i> Save Scheme-Cum</button>
+
+                <div style="margin-top:20px;">
+                    <h4 style="font-size:14px; font-weight:600; color:#0b1a33; margin-bottom:12px;">Existing Scheme-Cum Records</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Class</th>
+                                    <th>Subject</th>
+                                    <th>Term</th>
+                                    <th>Topics</th>
+                                    <th>Status</th>
+                                    <th style="text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Form 3C</td>
+                                    <td>Mathematics</td>
+                                    <td>Term 3</td>
+                                    <td>Number concepts, Algebra</td>
+                                    <td><span class="status-badge active">Published</span></td>
+                                    <td style="text-align:center;" class="action-icons">
+                                        <i class="fas fa-eye" title="View"></i>
+                                        <i class="fas fa-edit" title="Edit"></i>
+                                        <i class="fas fa-trash" title="Delete"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Grade 5</td>
+                                    <td>English</td>
+                                    <td>Term 2</td>
+                                    <td>Reading comprehension, Grammar</td>
+                                    <td><span class="status-badge pending">Draft</span></td>
+                                    <td style="text-align:center;" class="action-icons">
+                                        <i class="fas fa-eye" title="View"></i>
+                                        <i class="fas fa-edit" title="Edit"></i>
+                                        <i class="fas fa-trash" title="Delete"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Tab 2: Detailed Lesson Plan ===== -->
+            <div id="lesson-plan" class="tab-content">
+                <div class="card-title"><i class="fas fa-clipboard-list"></i> Detailed Lesson Plan</div>
+                <div class="form-grid">
+                    <label>Class
+                        <select>
+                            <option>Form 3C</option>
+                            <option>Form 2B</option>
+                            <option>Grade 5</option>
+                            <option>Grade 1</option>
+                        </select>
+                    </label>
+                    <label>Subject
+                        <select>
+                            <option>Mathematics</option>
+                            <option>English</option>
+                            <option>Indigenous Language</option>
+                            <option>Social Science</option>
+                            <option>Science & Technology</option>
+                            <option>PE & Arts</option>
+                        </select>
+                    </label>
+                    <label>Date
+                        <input type="date" value="2026-08-02">
+                    </label>
+                    <label>Duration (minutes)
+                        <input type="number" value="45" min="30" max="90">
+                    </label>
+                </div>
+                <div class="form-grid">
+                    <label style="grid-column: span 2;">Lesson Objectives
+                        <textarea placeholder="What learners should achieve by the end of the lesson..."></textarea>
+                    </label>
+                </div>
+                <div class="form-grid">
+                    <label style="grid-column: span 2;">Teaching Methods & Activities
+                        <textarea placeholder="e.g. Group discussion, demonstration, hands-on activity..."></textarea>
+                    </label>
+                </div>
+                <div class="form-grid">
+                    <label style="grid-column: span 2;">Assessment / Evaluation
+                        <textarea placeholder="How will you measure understanding?"></textarea>
+                    </label>
+                </div>
+                <button class="btn-success"><i class="fas fa-save"></i> Save Lesson Plan</button>
+
+                <div style="margin-top:20px;">
+                    <h4 style="font-size:14px; font-weight:600; color:#0b1a33; margin-bottom:12px;">Existing Lesson Plans</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Class</th>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>Objectives</th>
+                                    <th style="text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Form 3C</td>
+                                    <td>Mathematics</td>
+                                    <td>2026-08-01</td>
+                                    <td>Understand algebra basics</td>
+                                    <td style="text-align:center;" class="action-icons">
+                                        <i class="fas fa-eye" title="View"></i>
+                                        <i class="fas fa-edit" title="Edit"></i>
+                                        <i class="fas fa-trash" title="Delete"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Tab 3: Scheme of Work ===== -->
+            <div id="scheme-work" class="tab-content">
+                <div class="card-title"><i class="fas fa-calendar-week"></i> Scheme of Work (Termly)</div>
+                <div class="form-grid">
+                    <label>Class
+                        <select>
+                            <option>Form 3C</option>
+                            <option>Form 2B</option>
+                            <option>Grade 5</option>
+                            <option>Grade 1</option>
+                        </select>
+                    </label>
+                    <label>Subject
+                        <select>
+                            <option>Mathematics</option>
+                            <option>English</option>
+                            <option>Indigenous Language</option>
+                            <option>Social Science</option>
+                            <option>Science & Technology</option>
+                            <option>PE & Arts</option>
+                        </select>
+                    </label>
+                    <label>Term
+                        <select>
+                            <option>Term 1</option>
+                            <option>Term 2</option>
+                            <option selected>Term 3</option>
+                        </select>
+                    </label>
+                    <label>Year
+                        <select>
+                            <option>2025</option>
+                            <option selected>2026</option>
+                            <option>2027</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-grid">
+                    <label style="grid-column: span 2;">Weekly Breakdown (Week 1-10)
+                        <textarea placeholder="Week 1: Topic A, Week 2: Topic B, ..."></textarea>
+                    </label>
+                </div>
+                <div class="form-grid">
+                    <label style="grid-column: span 2;">Resources / Materials Needed
+                        <input type="text" placeholder="e.g. Textbooks, charts, manipulatives">
+                    </label>
+                </div>
+                <button class="btn-success"><i class="fas fa-save"></i> Save Scheme of Work</button>
+
+                <div style="margin-top:20px;">
+                    <h4 style="font-size:14px; font-weight:600; color:#0b1a33; margin-bottom:12px;">Existing Schemes of Work</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Class</th>
+                                    <th>Subject</th>
+                                    <th>Term</th>
+                                    <th>Weeks</th>
+                                    <th style="text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Form 3C</td>
+                                    <td>Mathematics</td>
+                                    <td>Term 3</td>
+                                    <td>10 weeks</td>
+                                    <td style="text-align:center;" class="action-icons">
+                                        <i class="fas fa-eye" title="View"></i>
+                                        <i class="fas fa-edit" title="Edit"></i>
+                                        <i class="fas fa-trash" title="Delete"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zimbabwe Education 5.0 Note -->
+        <div style="background:#fef9e7; border-radius:12px; padding:16px 20px; border-left:4px solid #f1c40f;">
+            <div style="font-size:14px; color:#0b1a33;">
+                <i class="fas fa-info-circle" style="color:#f1c40f;"></i> 
+                <strong>Zimbabwe Primary Education 5.0 — Scheme & Lesson Planning:</strong>
+                <br>
+                Teachers are required to prepare <strong>Scheme-Cum</strong> (combining scheme and record), 
+                <strong>Detailed Lesson Plans</strong> for each lesson, and a <strong>Termly Scheme of Work</strong>.
+                These documents ensure alignment with the Heritage Based Curriculum and track learner progress.
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:30px; font-size:13px; color:#b0c0d0; border-top:1px solid #e9edf4; padding-top:20px;">
+            Bvute Primary School — Zimbabwe Education 5.0 | Heritage Based Curriculum
+        </div>
+    </main>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const target = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+            });
+        });
+
+        // Save buttons (demo placeholders)
+        document.querySelectorAll('.btn-success').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('✅ Saved successfully! (Firestore integration coming)');
+            });
+        });
+
+        // View, edit, delete actions
+        document.querySelectorAll('.action-icons .fa-eye').forEach(icon => {
+            icon.addEventListener('click', () => alert('👁️ View details (Firestore integration coming)'));
+        });
+        document.querySelectorAll('.action-icons .fa-edit').forEach(icon => {
+            icon.addEventListener('click', () => alert('✏️ Edit (Firestore integration coming)'));
+        });
+        document.querySelectorAll('.action-icons .fa-trash').forEach(icon => {
+            icon.addEventListener('click', () => {
+                if (confirm('⚠️ Permanently delete this record?')) {
+                    alert('🗑️ Deleted (Firestore integration needed)');
+                }
+            });
+        });
+
+        // Logout confirmation
+        document.querySelector('.logout-btn')?.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to logout?')) {
+                e.preventDefault();
+            }
+        });
+
+        console.log('✅ admin/schemes.html loaded successfully.');
+        console.log('📌 Includes Scheme-Cum, Detailed Lesson Plans, and Scheme of Work.');
+    </script>
+
+</body>
+</html>
