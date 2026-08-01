@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fees — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">Admin Console</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Admin</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <a href="dashboard.html" style="font-size:0.82rem;">← Back to dashboard</a>
+
+  <div class="form-card" style="margin-top:14px;">
+    <h3>Fees &amp; receipts</h3>
+    <div class="field-hint" style="margin-bottom:8px;">Parent self-service viewing is coming in a later update — for now, share balances and receipt numbers with parents directly (WhatsApp, in person, etc).</div>
+    <div class="field-row" style="grid-template-columns: 1fr 1fr;">
+      <div class="field">
+        <label>Class</label>
+        <select id="fClass">
+          <option value="">— Select —</option>
+          <option>ECD A</option><option>ECD B</option>
+          <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+          <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Term</label>
+        <select id="fTerm">
+          <option>Term 1</option><option>Term 2</option><option>Term 3</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="feesWrap"></div>
+
+  <div id="paymentModal" style="display:none;" class="form-card">
+    <h3 id="pmLearnerName">Record a payment</h3>
+    <div class="field-row" style="grid-template-columns: 1fr 1fr;">
+      <div class="field">
+        <label>Amount paid</label>
+        <input type="number" id="pmAmount" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label>Method</label>
+        <select id="pmMethod">
+          <option>Cash</option>
+          <option>EcoCash</option>
+          <option>Bank Transfer</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" style="max-width:220px;">
+      <label>Date</label>
+      <input type="date" id="pmDate">
+    </div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary" id="pmSaveBtn">Save payment &amp; issue receipt</button>
+      <button class="btn btn-outline" id="pmCancelBtn" style="margin-left:8px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('admin', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Admin';
+  });
+
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.style.display = 'block';
+    setTimeout(() => (t.style.display = 'none'), 3500);
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+
+  let currentClass = null, currentTerm = null, currentLearners = [];
+
+  async function loadFees() {
+    currentClass = document.getElementById('fClass').value;
+    currentTerm = document.getElementById('fTerm').value;
+    const wrap = document.getElementById('feesWrap');
+    if (!currentClass) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = '<div class="empty-state">Loading…</div>';
+
+    try {
+      const learnersSnap = await db.collection('users').where('role', '==', 'learner').where('assignedClass', '==', currentClass).get();
+      currentLearners = [];
+      learnersSnap.forEach(doc => currentLearners.push({ id: doc.id, fullName: doc.data().fullName || 'Unnamed' }));
+
+      if (currentLearners.length === 0) {
+        wrap.innerHTML = '<div class="empty-state">No learners in this class yet.</div>';
+        return;
+      }
+
+      let rows = '';
+      for (const l of currentLearners) {
+        const docId = l.id + '_' + currentTerm;
+        const doc = await db.collection('fees').doc(docId).get();
+        const data = doc.exists ? doc.data() : { amountDue: 0, payments: [] };
+        const paid = (data.payments || []).reduce((s, p) => s + p.amount, 0);
+        const balance = (data.amountDue || 0) - paid;
+        rows += `
+          <tr>
+            <td>${escapeHtml(l.fullName)}</td>
+            <td><input type="number" class="dueInput" data-uid="${l.id}" value="${data.amountDue || 0}" style="width:80px; padding:5px; border:1px solid var(--line); border-radius:6px;"></td>
+            <td>$${paid.toFixed(2)}</td>
+            <td style="color:${balance > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:600;">$${balance.toFixed(2)}</td>
+            <td>
+              <button class="icon-btn" onclick="saveDue('${l.id}')">Save due</button>
+              <button class="icon-btn" onclick="openPayment('${l.id}','${escapeHtml(l.fullName)}')">Add payment</button>
+            </td>
+          </tr>`;
+      }
+      wrap.innerHTML = `
+        <div class="data-table-wrap" style="margin-top:16px;">
+          <table class="data-table">
+            <thead><tr><th>Learner</th><th>Due</th><th>Paid</th><th>Balance</th><th>Actions</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    } catch (e) {
+      wrap.innerHTML = '<div class="empty-state">Could not load fees.</div>';
+    }
+  }
+
+  document.getElementById('fClass').addEventListener('change', loadFees);
+  document.getElementById('fTerm').addEventListener('change', loadFees);
+
+  async function saveDue(uid) {
+    const input = document.querySelector('.dueInput[data-uid="' + uid + '"]');
+    const amountDue = Number(input.value) || 0;
+    const docId = uid + '_' + currentTerm;
+    const learner = currentLearners.find(l => l.id === uid);
+    try {
+      await db.collection('fees').doc(docId).set({
+        learnerUid: uid, learnerName: learner.fullName, className: currentClass, term: currentTerm, amountDue
+      }, { merge: true });
+      showToast('Amount due updated.');
+      loadFees();
+    } catch (e) {
+      showToast('Could not save.', true);
+    }
+  }
+
+  let paymentTargetUid = null;
+  function openPayment(uid, name) {
+    paymentTargetUid = uid;
+    document.getElementById('pmLearnerName').textContent = 'Record a payment — ' + name;
+    document.getElementById('pmAmount').value = '';
+    document.getElementById('pmDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('paymentModal').style.display = 'block';
+    document.getElementById('paymentModal').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('pmCancelBtn').addEventListener('click', () => {
+    document.getElementById('paymentModal').style.display = 'none';
+    paymentTargetUid = null;
+  });
+
+  document.getElementById('pmSaveBtn').addEventListener('click', async () => {
+    const amount = Number(document.getElementById('pmAmount').value);
+    const method = document.getElementById('pmMethod').value;
+    const date = document.getElementById('pmDate').value;
+    if (!amount || amount <= 0) { showToast('Enter a valid amount.', true); return; }
+
+    const docId = paymentTargetUid + '_' + currentTerm;
+    const learner = currentLearners.find(l => l.id === paymentTargetUid);
+    const receiptNo = 'RCT-' + Date.now().toString().slice(-8);
+
+    try {
+      const docRef = db.collection('fees').doc(docId);
+      const doc = await docRef.get();
+      const existingPayments = doc.exists ? (doc.data().payments || []) : [];
+      const existingDue = doc.exists ? (doc.data().amountDue || 0) : 0;
+      existingPayments.push({ amount, method, date, receiptNo });
+
+      await docRef.set({
+        learnerUid: paymentTargetUid, learnerName: learner.fullName, className: currentClass, term: currentTerm,
+        amountDue: existingDue, payments: existingPayments
+      }, { merge: true });
+
+      showToast('Payment recorded — receipt ' + receiptNo);
+      document.getElementById('paymentModal').style.display = 'none';
+      loadFees();
+    } catch (e) {
+      showToast('Could not save payment.', true);
+    }
+  });
+</script>
+</body>
+</html>
