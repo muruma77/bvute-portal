@@ -1,16 +1,24 @@
+// ============================================
+// BVUTE PORTAL - Firebase Authentication
+// ============================================
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDi-fHhHUHv2zy3lhbQJH4fEf8CeV6HRA0",
-  authDomain: "bvute-primary-school.firebaseapp.com",
-  projectId: "bvute-primary-school",
-  storageBucket: "bvute-primary-school.firebasestorage.app",
-  messagingSenderId: "505767882741",
-  appId: "1:505767882741:web:3cc5892a2c7673ebd2fabc"
+    apiKey: "AIzaSyDi-fHhHUHv2zy3lhbQJH4fEf8CeV6HRA0",
+    authDomain: "bvute-primary-school.firebaseapp.com",
+    projectId: "bvute-primary-school",
+    storageBucket: "bvute-primary-school.firebasestorage.app",
+    messagingSenderId: "505767882741",
+    appId: "1:505767882741:web:3cc5892a2c7673ebd2fabc"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+console.log('✅ Firebase initialized');
+
+// DOM Elements
 const roleOptions = document.querySelectorAll('.role-option');
 const loginForm = document.getElementById('loginForm');
 const emailInput = document.getElementById('emailInput');
@@ -20,6 +28,7 @@ const alertDiv = document.getElementById('alertMessage');
 
 let selectedRole = 'admin';
 
+// --- Role Selection ---
 roleOptions.forEach(opt => {
     opt.addEventListener('click', function() {
         roleOptions.forEach(o => o.classList.remove('active'));
@@ -28,12 +37,20 @@ roleOptions.forEach(opt => {
     });
 });
 
+// --- Show Alert ---
 function showAlert(message, type = 'danger') {
     alertDiv.textContent = message;
     alertDiv.className = `alert alert-${type} show`;
     setTimeout(() => { alertDiv.classList.remove('show'); }, 5000);
 }
 
+// --- Reset Login Button ---
+function resetLoginButton() {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+}
+
+// --- LOGIN ---
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -49,16 +66,19 @@ loginForm.addEventListener('submit', async (e) => {
     loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
     try {
+        console.log('Attempting login for:', email);
+        
         const userCred = await auth.signInWithEmailAndPassword(email, password);
         const user = userCred.user;
+        
+        console.log('✅ User authenticated:', user.uid);
 
         const doc = await db.collection('users').doc(user.uid).get();
         
         if (!doc.exists) {
             await auth.signOut();
             showAlert('User profile not found. Contact admin.', 'danger');
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            resetLoginButton();
             return;
         }
 
@@ -69,19 +89,19 @@ loginForm.addEventListener('submit', async (e) => {
         if (status === 'disabled') {
             await auth.signOut();
             showAlert('Your account has been disabled. Contact admin.', 'danger');
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            resetLoginButton();
             return;
         }
 
         if (selectedRole !== dbRole) {
             await auth.signOut();
             showAlert(`You selected "${selectedRole}" but this account is registered as "${dbRole}".`, 'danger');
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            resetLoginButton();
             return;
         }
 
+        console.log('✅ Login successful. Redirecting to:', dbRole);
+        
         const redirectMap = {
             'admin': 'admin/dashboard.html',
             'teacher': 'teacher/dashboard.html',
@@ -91,19 +111,22 @@ loginForm.addEventListener('submit', async (e) => {
         window.location.href = redirectMap[dbRole] || 'index.html';
 
     } catch (error) {
+        console.error('Login error:', error.code, error.message);
+        
         let msg = 'Login failed. Check credentials.';
         if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
         if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
         if (error.code === 'auth/too-many-requests') msg = 'Too many failed attempts. Try later.';
         if (error.code === 'auth/invalid-email') msg = 'Invalid email format.';
         if (error.code === 'auth/network-request-failed') msg = 'Network error. Check your internet connection.';
+        if (error.code === 'auth/configuration-not-found') msg = 'Firebase configuration error. Check your config.';
         
         showAlert(msg, 'danger');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+        resetLoginButton();
     }
 });
 
+// --- Password Reset Request ---
 document.getElementById('resetRequestBtn')?.addEventListener('click', async () => {
     const email = prompt('Enter your registered email address to request a password reset:');
     if (!email) return;
@@ -129,3 +152,5 @@ document.getElementById('resetRequestBtn')?.addEventListener('click', async () =
         console.error(err);
     }
 });
+
+console.log('✅ BVUTE Portal Auth loaded successfully.');
