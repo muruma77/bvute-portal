@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">Admin Console</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Admin</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <a href="dashboard.html" style="font-size:0.82rem;">← Back to dashboard</a>
+
+  <div class="form-card" style="margin-top:14px;">
+    <h3>View a class register</h3>
+    <div class="field-row" style="grid-template-columns: 1fr 1fr;">
+      <div class="field">
+        <label>Class</label>
+        <select id="vClass">
+          <option value="">— Select —</option>
+          <option>ECD A</option><option>ECD B</option>
+          <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+          <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="vDate">
+      </div>
+    </div>
+  </div>
+
+  <div id="viewWrap"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('admin', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Admin';
+    document.getElementById('vDate').value = new Date().toISOString().slice(0, 10);
+  });
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+
+  async function loadView() {
+    const cls = document.getElementById('vClass').value;
+    const date = document.getElementById('vDate').value;
+    const wrap = document.getElementById('viewWrap');
+    if (!cls || !date) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = '<div class="empty-state">Loading…</div>';
+
+    try {
+      const docId = cls + '_' + date;
+      const doc = await db.collection('attendance').doc(docId).get();
+      if (!doc.exists) { wrap.innerHTML = '<div class="empty-state">No register taken for ' + cls + ' on ' + date + '.</div>'; return; }
+
+      const records = doc.data().records || {};
+      const learnersSnap = await db.collection('users').where('role', '==', 'learner').where('assignedClass', '==', cls).get();
+      let present = 0, late = 0, absent = 0;
+      let rows = '';
+      learnersSnap.forEach(l => {
+        const status = records[l.id] || '—';
+        if (status === 'present') present++;
+        if (status === 'late') late++;
+        if (status === 'absent') absent++;
+        rows += `<tr><td>${escapeHtml(l.data().fullName || '—')}</td><td style="text-transform:capitalize;">${status}</td></tr>`;
+      });
+
+      wrap.innerHTML = `
+        <div class="grid" style="margin-top:16px;">
+          <div class="card"><div class="meta">Present</div><div class="stat" style="color:var(--success);">${present}</div></div>
+          <div class="card"><div class="meta">Late</div><div class="stat" style="color:var(--warning);">${late}</div></div>
+          <div class="card"><div class="meta">Absent</div><div class="stat" style="color:var(--danger);">${absent}</div></div>
+        </div>
+        <div class="data-table-wrap" style="margin-top:16px;">
+          <table class="data-table"><thead><tr><th>Learner</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>
+        </div>`;
+    } catch (e) {
+      wrap.innerHTML = '<div class="empty-state">Could not load register.</div>';
+    }
+  }
+
+  document.getElementById('vClass').addEventListener('change', loadView);
+  document.getElementById('vDate').addEventListener('change', loadView);
+</script>
+</body>
+</html>
