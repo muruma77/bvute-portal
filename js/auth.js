@@ -1,15 +1,15 @@
 // ============================================
-// BVUTE PORTAL - Firebase Authentication (FIXED)
+// BVUTE PORTAL - Firebase Authentication
 // ============================================
 
-// ⚠️ IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG
+// Firebase Config (Your actual config)
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDi-fHhHUHv2zy3lhbQJH4fEf8CeV6HRA0",
+  authDomain: "bvute-primary-school.firebaseapp.com",
+  projectId: "bvute-primary-school",
+  storageBucket: "bvute-primary-school.firebasestorage.app",
+  messagingSenderId: "505767882741",
+  appId: "1:505767882741:web:3cc5892a2c7673ebd2fabc"
 };
 
 // Initialize Firebase
