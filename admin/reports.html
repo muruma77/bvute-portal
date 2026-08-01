@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bvute Admin - Reports</title>
+    <link rel="icon" href="../IMG-20260724-WA5314" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .main-content {
+            flex: 1;
+            padding: 24px 32px 40px 32px;
+            overflow-y: auto;
+            margin-left: 260px;
+            background: #f4f7fc;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9edf4;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topbar h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0b1a33;
+        }
+
+        .topbar h1 span {
+            font-weight: 400;
+            font-size: 14px;
+            color: #6b7a8f;
+            margin-left: 10px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .topbar-actions .admin-badge {
+            background: #eef3fe;
+            color: #2a6df4;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .topbar-actions .logout-btn {
+            background: #fee;
+            color: #d1453b;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .topbar-actions .logout-btn:hover {
+            background: #fdd;
+        }
+
+        .panel-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            margin-bottom: 28px;
+        }
+
+        .panel-card .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b1a33;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-card .card-title i {
+            color: #2a6df4;
+        }
+
+        .btn-primary {
+            background: #2a6df4;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #1a5adf;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(42,109,244,0.25);
+        }
+
+        .btn-success {
+            background: #0f973d;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-success:hover {
+            background: #0d7f33;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-warning:hover {
+            background: #d68910;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .form-grid label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #34495e;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-grid input,
+        .form-grid select {
+            padding: 10px 14px;
+            border: 1px solid #dce3ec;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafcff;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .form-grid input:focus,
+        .form-grid select:focus {
+            border-color: #2a6df4;
+            box-shadow: 0 0 0 3px rgba(42,109,244,0.12);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table thead {
+            background: #f8fafd;
+        }
+
+        table thead th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #1e2a3a;
+            border-bottom: 2px solid #e9edf4;
+            white-space: nowrap;
+        }
+
+        table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #edf2f7;
+            color: #1e2a3a;
+        }
+
+        table tbody tr:hover {
+            background: #f8faff;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.active {
+            background: #e6f7ed;
+            color: #0f973d;
+        }
+
+        .status-badge.pending {
+            background: #fff3d6;
+            color: #b47d2a;
+        }
+
+        .inline-flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .text-muted {
+            color: #6b7a8f;
+            font-size: 13px;
+        }
+
+        .live-clock {
+            background: #0b1a33;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-clock i {
+            color: #f1c40f;
+        }
+
+        .report-card {
+            background: #f8fafd;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-left: 4px solid #2a6df4;
+            transition: 0.2s;
+        }
+
+        .report-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .report-card .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .report-card .report-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #0b1a33;
+        }
+
+        .report-card .report-meta {
+            font-size: 13px;
+            color: #6b7a8f;
+        }
+
+        .report-card .report-body {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #1e2a3a;
+        }
+
+        .report-card .report-footer {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 13px;
+            color: #6b7a8f;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .report-stat {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafd;
+            border-radius: 12px;
+        }
+
+        .report-stat .number {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .report-stat .label {
+            font-size: 13px;
+            color: #6b7a8f;
+        }
+
+        .report-stat.total .number { color: #0b1a33; }
+        .report-stat.generated .number { color: #0f973d; }
+        .report-stat.pending .number { color: #f39c12; }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 70px;
+                padding: 16px;
+            }
+            .topbar h1 {
+                font-size: 18px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .report-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="../IMG-20260724-WA5314" alt="Bvute Logo">
+            <div class="brand-text">
+                <div class="school-name">Bvute</div>
+                <div class="school-sub">Admin Panel</div>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="menu-label">Main</li>
+            <li><a href="dashboard.html"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+            <li><a href="students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+            <li><a href="teachers.html"><i class="fas fa-chalkboard-user"></i> <span>Teachers</span></a></li>
+            <li><a href="classes.html"><i class="fas fa-building-columns"></i> <span>Classes</span></a></li>
+            <li><a href="subjects.html"><i class="fas fa-book-open"></i> <span>Subjects</span></a></li>
+            <li><a href="results.html"><i class="fas fa-table"></i> <span>Results</span></a></li>
+            <li class="menu-label">Education 5.0</li>
+            <li><a href="schemes.html"><i class="fas fa-pen-fancy"></i> <span>Schemes & Plans</span></a></li>
+            <li><a href="record-books.html"><i class="fas fa-notebook"></i> <span>Record Books</span></a></li>
+            <li><a href="attendance.html"><i class="fas fa-clipboard-check"></i> <span>Attendance</span></a></li>
+            <li><a href="holidays.html"><i class="fas fa-umbrella-beach"></i> <span>Holiday Work</span></a></li>
+            <li class="menu-label">Finance</li>
+            <li><a href="fees.html"><i class="fas fa-coins"></i> <span>Fees</span></a></li>
+            <li><a href="payments.html"><i class="fas fa-credit-card"></i> <span>Payments</span></a></li>
+            <li class="menu-label">System</li>
+            <li><a href="documents.html"><i class="fas fa-folder-open"></i> <span>Documents</span></a></li>
+            <li><a href="settings.html"><i class="fas fa-gear"></i> <span>Settings</span></a></li>
+            <li><a href="reports.html" class="active"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="../index.html"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div>
+                <h1>📊 Reports <span>Admin / System</span></h1>
+                <div style="font-size:13px; color:#6b7a8f; margin-top:4px;">
+                    <i class="fas fa-flag"></i> Zimbabwe Education 5.0 — Heritage Based Curriculum
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <div class="live-clock"><i class="fas fa-clock"></i> <span id="liveTime">Loading...</span></div>
+                <span class="admin-badge"><i class="fas fa-shield-alt"></i> Admin</span>
+                <button class="logout-btn" onclick="window.location.href='../index.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <!-- Report Stats -->
+        <div class="report-grid">
+            <div class="report-stat total">
+                <div class="number">12</div>
+                <div class="label">📄 Total Reports</div>
+            </div>
+            <div class="report-stat generated">
+                <div class="number">8</div>
+                <div class="label">✅ Generated</div>
+            </div>
+            <div class="report-stat pending">
+                <div class="number">4</div>
+                <div class="label">⏳ Pending</div>
+            </div>
+        </div>
+
+        <!-- Generate Report Form -->
+        <div class="panel-card">
+            <div class="card-title"><i class="fas fa-plus-circle"></i> Generate New Report</div>
+            <div class="form-grid">
+                <label>Report Type
+                    <select>
+                        <option>Academic Performance</option>
+                        <option>Attendance Summary</option>
+                        <option>Fee Collection</option>
+                        <option>Class List</option>
+                        <option>Teacher Records</option>
+                        <option>Holiday Work</option>
+                        <option>Results Analysis</option>
+                    </select>
+                </label>
+                <label>Class
+                    <select>
+                        <option>All Classes</option>
+                        <option>Form 3C</option>
+                        <option>Form 2B</option>
+                        <option>Grade 5</option>
+                    </select>
+                </label>
+                <label>Term
+                    <select>
+                        <option>Term 1</option>
+                        <option>Term 2</option>
+                        <option selected>Term 3</option>
+                    </select>
+                </label>
+                <label>Year
+                    <select>
+                        <option>2025</option>
+                        <option selected>2026</option>
+                        <option>2027</option>
+                    </select>
+                </label>
+            </div>
+            <div class="form-grid">
+                <label style="grid-column: span 2;">Format
+                    <select>
+                        <option>PDF</option>
+                        <option>Excel (CSV)</option>
+                        <option>Print</option>
+                    </select>
+                </label>
+            </div>
+            <button class="btn-success"><i class="fas fa-file-export"></i> Generate Report</button>
+        </div>
+
+        <!-- Report List -->
+        <div class="panel-card" style="padding: 20px 24px;">
+            <div class="card-title" style="margin-bottom: 16px;">
+                <i class="fas fa-list-ul" style="color:#2a6df4;"></i> Generated Reports
+                <span style="font-size:13px; font-weight:400; color:#6b7a8f; margin-left:8px;">(12 total)</span>
+            </div>
+
+            <!-- Report 1 -->
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-title">📊 Academic Performance — Form 3C</div>
+                    <div class="report-meta">
+                        <span class="status-badge active">Generated</span>
+                        <span><i class="far fa-calendar-alt"></i> 2026-07-30</span>
+                    </div>
+                </div>
+                <div class="report-body">
+                    Term 3 academic performance report for Form 3C. Includes all 6 subjects with grades and overall averages.
+                </div>
+                <div class="report-footer">
+                    <span><i class="far fa-file-pdf"></i> PDF, 2.4 MB</span>
+                    <span>
+                        <i class="fas fa-download" style="cursor:pointer; color:#2a6df4;"></i>
+                        <i class="fas fa-eye" style="cursor:pointer; color:#6b7a8f; margin-left:12px;"></i>
+                        <i class="fas fa-trash" style="cursor:pointer; color:#e74c3c; margin-left:12px;"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Report 2 -->
+            <div class="report-card" style="border-left-color: #0f973d;">
+                <div class="report-header">
+                    <div class="report-title">📋 Attendance Summary — All Classes</div>
+                    <div class="report-meta">
+                        <span class="status-badge active">Generated</span>
+                        <span><i class="far fa-calendar-alt"></i> 2026-07-28</span>
+                    </div>
+                </div>
+                <div class="report-body">
+                    Attendance summary for all classes for Term 3. Includes daily attendance rates and trends.
+                </div>
+                <div class="report-footer">
+                    <span><i class="far fa-file-excel"></i> Excel, 1.8 MB</span>
+                    <span>
+                        <i class="fas fa-download" style="cursor:pointer; color:#2a6df4;"></i>
+                        <i class="fas fa-eye" style="cursor:pointer; color:#6b7a8f; margin-left:12px;"></i>
+                        <i class="fas fa-trash" style="cursor:pointer; color:#e74c3c; margin-left:12px;"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Report 3 -->
+            <div class="report-card" style="border-left-color: #f39c12;">
+                <div class="report-header">
+                    <div class="report-title">💰 Fee Collection — Term 3</div>
+                    <div class="report-meta">
+                        <span class="status-badge pending">Pending</span>
+                        <span><i class="far fa-calendar-alt"></i> 2026-07-25</span>
+                    </div>
+                </div>
+                <div class="report-body">
+                    Fee collection report for Term 3. Shows payments, outstanding balances, and receipt status.
+                </div>
+                <div class="report-footer">
+                    <span><i class="far fa-file-pdf"></i> PDF, 1.2 MB</span>
+                    <span>
+                        <i class="fas fa-download" style="cursor:pointer; color:#2a6df4;"></i>
+                        <i class="fas fa-eye" style="cursor:pointer; color:#6b7a8f; margin-left:12px;"></i>
+                        <i class="fas fa-trash" style="cursor:pointer; color:#e74c3c; margin-left:12px;"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Report 4 -->
+            <div class="report-card" style="border-left-color: #8e44ad;">
+                <div class="report-header">
+                    <div class="report-title">👨‍🎓 Class List — Form 3C</div>
+                    <div class="report-meta">
+                        <span class="status-badge active">Generated</span>
+                        <span><i class="far fa-calendar-alt"></i> 2026-07-20</span>
+                    </div>
+                </div>
+                <div class="report-body">
+                    Complete class list for Form 3C with student names, admission numbers, and guardian details.
+                </div>
+                <div class="report-footer">
+                    <span><i class="far fa-file-pdf"></i> PDF, 0.8 MB</span>
+                    <span>
+                        <i class="fas fa-download" style="cursor:pointer; color:#2a6df4;"></i>
+                        <i class="fas fa-eye" style="cursor:pointer; color:#6b7a8f; margin-left:12px;"></i>
+                        <i class="fas fa-trash" style="cursor:pointer; color:#e74c3c; margin-left:12px;"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Report 5 -->
+            <div class="report-card" style="border-left-color: #1abc9c;">
+                <div class="report-header">
+                    <div class="report-title">📚 Holiday Work — August 2026</div>
+                    <div class="report-meta">
+                        <span class="status-badge active">Generated</span>
+                        <span><i class="far fa-calendar-alt"></i> 2026-07-15</span>
+                    </div>
+                </div>
+                <div class="report-body">
+                    Holiday work report for August 2026. Shows assignments, submissions, and grading status.
+                </div>
+                <div class="report-footer">
+                    <span><i class="far fa-file-excel"></i> Excel, 0.6 MB</span>
+                    <span>
+                        <i class="fas fa-download" style="cursor:pointer; color:#2a6df4;"></i>
+                        <i class="fas fa-eye" style="cursor:pointer; color:#6b7a8f; margin-left:12px;"></i>
+                        <i class="fas fa-trash" style="cursor:pointer; color:#e74c3c; margin-left:12px;"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div style="padding: 16px 0 0 0; display: flex; justify-content: space-between; font-size: 13px; color: #6b7a8f; border-top: 1px solid #edf2f7; margin-top: 12px; padding-top: 16px;">
+                <span>Showing 5 of 12 reports</span>
+                <span>
+                    <i class="fas fa-chevron-left" style="margin-right:12px; cursor:pointer;"></i>
+                    Page 1 of 3
+                    <i class="fas fa-chevron-right" style="margin-left:12px; cursor:pointer;"></i>
+                </span>
+            </div>
+        </div>
+
+        <!-- Report Templates -->
+        <div class="panel-card">
+            <div class="card-title"><i class="fas fa-copy"></i> Report Templates</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px; text-align:center;">
+                    <i class="fas fa-graduation-cap" style="font-size:24px; color:#2a6df4;"></i>
+                    <div style="font-weight:600; margin-top:6px;">Academic Report</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Student performance</div>
+                </div>
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px; text-align:center;">
+                    <i class="fas fa-clipboard-check" style="font-size:24px; color:#0f973d;"></i>
+                    <div style="font-weight:600; margin-top:6px;">Attendance Report</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Daily attendance summary</div>
+                </div>
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px; text-align:center;">
+                    <i class="fas fa-coins" style="font-size:24px; color:#f39c12;"></i>
+                    <div style="font-weight:600; margin-top:6px;">Fee Report</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Payment and balance</div>
+                </div>
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px; text-align:center;">
+                    <i class="fas fa-users" style="font-size:24px; color:#8e44ad;"></i>
+                    <div style="font-weight:600; margin-top:6px;">Class List</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Student roster</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Education 5.0 Note -->
+        <div style="background:#fef9e7; border-radius:12px; padding:16px 20px; border-left:4px solid #f1c40f;">
+            <div style="font-size:14px; color:#0b1a33;">
+                <i class="fas fa-info-circle" style="color:#f1c40f;"></i> 
+                <strong>Zimbabwe Primary Education 5.0 — Reports:</strong>
+                <br>
+                Generate comprehensive reports for academic performance, attendance, fee collection, and more.
+                All reports are aligned with the Heritage Based Curriculum and can be exported in PDF or Excel formats.
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:30px; font-size:13px; color:#b0c0d0; border-top:1px solid #e9edf4; padding-top:20px;">
+            Bvute Primary School — Zimbabwe Education 5.0 | Heritage Based Curriculum
+        </div>
+    </main>
+
+    <script>
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const opts = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-ZA', opts) + ' • ' + now.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Generate Report button
+        document.querySelector('.btn-success')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('✅ Report generated successfully! (Firestore integration coming)');
+        });
+
+        // Download report
+        document.querySelectorAll('.report-footer .fa-download').forEach(icon => {
+            icon.addEventListener('click', () => alert('⬇️ Downloading report... (Firestore integration coming)'));
+        });
+
+        // View report
+        document.querySelectorAll('.report-footer .fa-eye').forEach(icon => {
+            icon.addEventListener('click', () => alert('👁️ View report (Firestore integration coming)'));
+        });
+
+        // Delete report
+        document.querySelectorAll('.report-footer .fa-trash').forEach(icon => {
+            icon.addEventListener('click', () => {
+                if (confirm('⚠️ Permanently delete this report?')) {
+                    alert('🗑️ Deleted (Firestore integration needed)');
+                }
+            });
+        });
+
+        // Logout confirmation
+        document.querySelector('.logout-btn')?.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to logout?')) {
+                e.preventDefault();
+            }
+        });
+
+        console.log('✅ admin/reports.html loaded successfully.');
+        console.log('📌 Reports management with generation, viewing, and downloading.');
+    </script>
+
+</body>
+</html>
