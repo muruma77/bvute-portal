@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bvute Parent - Fees</title>
+    <link rel="icon" href="../IMG-20260724-WA5314" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .main-content {
+            flex: 1;
+            padding: 24px 32px 40px 32px;
+            overflow-y: auto;
+            margin-left: 260px;
+            background: #f4f7fc;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9edf4;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topbar h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0b1a33;
+        }
+
+        .topbar h1 span {
+            font-weight: 400;
+            font-size: 14px;
+            color: #6b7a8f;
+            margin-left: 10px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .topbar-actions .parent-badge {
+            background: #f4ecf7;
+            color: #8e44ad;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .topbar-actions .logout-btn {
+            background: #fee;
+            color: #d1453b;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .topbar-actions .logout-btn:hover {
+            background: #fdd;
+        }
+
+        .panel-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            margin-bottom: 28px;
+        }
+
+        .panel-card .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b1a33;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-card .card-title i {
+            color: #f39c12;
+        }
+
+        .btn-primary {
+            background: #f39c12;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #d68910;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(243,156,18,0.25);
+        }
+
+        .btn-success {
+            background: #0f973d;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-success:hover {
+            background: #0d7f33;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .form-grid label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #34495e;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-grid input,
+        .form-grid select {
+            padding: 10px 14px;
+            border: 1px solid #dce3ec;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafcff;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .form-grid input:focus,
+        .form-grid select:focus {
+            border-color: #f39c12;
+            box-shadow: 0 0 0 3px rgba(243,156,18,0.12);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table thead {
+            background: #f8fafd;
+        }
+
+        table thead th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #1e2a3a;
+            border-bottom: 2px solid #e9edf4;
+            white-space: nowrap;
+        }
+
+        table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #edf2f7;
+            color: #1e2a3a;
+        }
+
+        table tbody tr:hover {
+            background: #f8faff;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.paid {
+            background: #e6f7ed;
+            color: #0f973d;
+        }
+
+        .status-badge.partial {
+            background: #fff3d6;
+            color: #b47d2a;
+        }
+
+        .status-badge.unpaid {
+            background: #fde8e5;
+            color: #d1453b;
+        }
+
+        .status-badge.pending {
+            background: #eef3fe;
+            color: #2a6df4;
+        }
+
+        .inline-flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .text-muted {
+            color: #6b7a8f;
+            font-size: 13px;
+        }
+
+        .text-success {
+            color: #0f973d;
+        }
+
+        .text-danger {
+            color: #d1453b;
+        }
+
+        .text-warning {
+            color: #f39c12;
+        }
+
+        .child-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f4ecf7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e44ad;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .class-badge {
+            background: #f4ecf7;
+            color: #8e44ad;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .fee-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .fee-stat {
+            text-align: center;
+            padding: 14px;
+            background: #f8fafd;
+            border-radius: 12px;
+        }
+
+        .fee-stat .number {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .fee-stat .label {
+            font-size: 13px;
+            color: #6b7a8f;
+        }
+
+        .fee-stat.total .number { color: #0b1a33; }
+        .fee-stat.paid .number { color: #0f973d; }
+        .fee-stat.unpaid .number { color: #d1453b; }
+
+        .live-clock {
+            background: #0b1a33;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-clock i {
+            color: #f1c40f;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #edf2f7;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar .progress-fill {
+            height: 100%;
+            background: #0f973d;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .fee-card {
+            background: #f8fafd;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .fee-card .fee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .fee-card .fee-child {
+            font-weight: 600;
+            color: #0b1a33;
+        }
+
+        .fee-card .fee-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .fee-card .fee-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #6b7a8f;
+        }
+
+        .fee-card .fee-details span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 70px;
+                padding: 16px;
+            }
+            .topbar h1 {
+                font-size: 18px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .fee-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .fee-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .fee-card .fee-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="../IMG-20260724-WA5314" alt="Bvute Logo">
+            <div class="brand-text">
+                <div class="school-name">Bvute</div>
+                <div class="school-sub">Parent Panel</div>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="menu-label">Main</li>
+            <li><a href="dashboard.html"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+            <li><a href="children.html"><i class="fas fa-child"></i> <span>My Children</span></a></li>
+            <li><a href="results.html"><i class="fas fa-table"></i> <span>Results</span></a></li>
+            <li><a href="attendance.html"><i class="fas fa-clipboard-check"></i> <span>Attendance</span></a></li>
+            <li><a href="fees.html" class="active"><i class="fas fa-coins"></i> <span>Fees</span></a></li>
+            <li class="menu-label">Communication</li>
+            <li><a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a></li>
+            <li><a href="holidays.html"><i class="fas fa-umbrella-beach"></i> <span>Holiday Work</span></a></li>
+            <li class="menu-label">System</li>
+            <li><a href="../index.html"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="../index.html"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div>
+                <h1>💰 Fees & Payments <span>Parent</span></h1>
+                <div style="font-size:13px; color:#6b7a8f; margin-top:4px;">
+                    <i class="fas fa-flag"></i> Zimbabwe Education 5.0 — Heritage Based Curriculum
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <div class="live-clock"><i class="fas fa-clock"></i> <span id="liveTime">Loading...</span></div>
+                <span class="parent-badge"><i class="fas fa-user-friends"></i> Parent</span>
+                <button class="logout-btn" onclick="window.location.href='../index.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <!-- Fee Stats -->
+        <div class="fee-stats">
+            <div class="fee-stat total">
+                <div class="number">$1,200</div>
+                <div class="label">💰 Total Fees</div>
+            </div>
+            <div class="fee-stat paid">
+                <div class="number">$850</div>
+                <div class="label">✅ Paid</div>
+            </div>
+            <div class="fee-stat unpaid">
+                <div class="number">$350</div>
+                <div class="label">❌ Outstanding</div>
+            </div>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="panel-card">
+            <div class="card-title"><i class="fas fa-sliders-h"></i> Filter Fees</div>
+            <div class="form-grid">
+                <label>Child
+                    <select>
+                        <option>All Children</option>
+                        <option selected>Tawanda Makoni (Form 3C)</option>
+                        <option>Chido Makoni (Grade 5)</option>
+                    </select>
+                </label>
+                <label>Term
+                    <select>
+                        <option>All Terms</option>
+                        <option>Term 1</option>
+                        <option>Term 2</option>
+                        <option selected>Term 3</option>
+                    </select>
+                </label>
+                <label>Year
+                    <select>
+                        <option>2025</option>
+                        <option selected>2026</option>
+                        <option>2027</option>
+                    </select>
+                </label>
+                <label style="justify-content:flex-end;">
+                    <button class="btn-primary" style="width:100%;"><i class="fas fa-search"></i> Load Fees</button>
+                </label>
+            </div>
+        </div>
+
+        <!-- Fee Cards -->
+        <div class="panel-card">
+            <div class="card-title"><i class="fas fa-receipt"></i> Fee Statement — Term 3 2026</div>
+
+            <!-- Tawanda's Fees -->
+            <div class="fee-card">
+                <div class="fee-header">
+                    <div>
+                        <span class="fee-child"><i class="fas fa-user-graduate" style="color:#8e44ad;"></i> Tawanda Makoni — Form 3C</span>
+                        <span class="class-badge" style="margin-left:8px;">Admission: BVT-2026-001</span>
+                    </div>
+                    <span class="fee-amount">$550.00</span>
+                </div>
+                <div class="fee-details">
+                    <span><strong>Tuition:</strong> $400.00</span>
+                    <span><strong>Development Levy:</strong> $100.00</span>
+                    <span><strong>Sports Fee:</strong> $50.00</span>
+                    <span><strong>Status:</strong> <span class="status-badge partial">Partial Paid</span></span>
+                </div>
+                <div style="margin-top:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <span>Paid: <strong class="text-success">$300.00</strong></span>
+                        <span>Balance: <strong class="text-danger">$250.00</strong></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:55%;"></div>
+                    </div>
+                    <div style="font-size:12px; color:#6b7a8f; margin-top:2px;">55% paid</div>
+                </div>
+                <div style="margin-top:8px; font-size:13px; color:#6b7a8f;">
+                    <i class="fas fa-calendar-alt"></i> Last Payment: 2026-07-15 ($150.00)
+                    <button class="btn-success" style="padding:4px 14px; font-size:11px; margin-left:12px;"><i class="fas fa-download"></i> Receipt</button>
+                </div>
+            </div>
+
+            <!-- Chido's Fees -->
+            <div class="fee-card" style="border-left-color: #0f973d;">
+                <div class="fee-header">
+                    <div>
+                        <span class="fee-child"><i class="fas fa-user-graduate" style="color:#8e44ad;"></i> Chido Makoni — Grade 5</span>
+                        <span class="class-badge" style="margin-left:8px;">Admission: BVT-2026-045</span>
+                    </div>
+                    <span class="fee-amount">$650.00</span>
+                </div>
+                <div class="fee-details">
+                    <span><strong>Tuition:</strong> $450.00</span>
+                    <span><strong>Development Levy:</strong> $100.00</span>
+                    <span><strong>Sports Fee:</strong> $50.00</span>
+                    <span><strong>Activity Fee:</strong> $50.00</span>
+                    <span><strong>Status:</strong> <span class="status-badge unpaid">Unpaid</span></span>
+                </div>
+                <div style="margin-top:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <span>Paid: <strong class="text-success">$0.00</strong></span>
+                        <span>Balance: <strong class="text-danger">$650.00</strong></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:0%;"></div>
+                    </div>
+                    <div style="font-size:12px; color:#6b7a8f; margin-top:2px;">0% paid</div>
+                </div>
+                <div style="margin-top:8px; font-size:13px; color:#6b7a8f;">
+                    <i class="fas fa-calendar-alt"></i> No payments recorded
+                    <button class="btn-primary" style="padding:4px 14px; font-size:11px; margin-left:12px;"><i class="fas fa-credit-card"></i> Pay Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="panel-card" style="padding: 0 0 20px 0; overflow: hidden;">
+            <div style="padding: 20px 28px 0 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div class="card-title" style="margin-bottom: 0;">
+                    <i class="fas fa-history" style="color:#f39c12;"></i> Payment History
+                </div>
+                <button class="btn-primary" style="padding: 6px 16px; font-size: 12px; background:#6b7a8f;">
+                    <i class="fas fa-file-export"></i> Export Statement
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Child</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Receipt #</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>2026-07-15</td>
+                            <td>Tawanda Makoni</td>
+                            <td>Tuition — Term 3</td>
+                            <td>$150.00</td>
+                            <td>EcoCash</td>
+                            <td>RCP-2026-001</td>
+                            <td><span class="status-badge paid">Paid</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>2026-06-10</td>
+                            <td>Tawanda Makoni</td>
+                            <td>Development Levy — Term 3</td>
+                            <td>$100.00</td>
+                            <td>Bank Transfer</td>
+                            <td>RCP-2026-002</td>
+                            <td><span class="status-badge paid">Paid</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>2026-05-20</td>
+                            <td>Tawanda Makoni</td>
+                            <td>Sports Fee — Term 3</td>
+                            <td>$50.00</td>
+                            <td>Cash</td>
+                            <td>RCP-2026-003</td>
+                            <td><span class="status-badge paid">Paid</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>2026-04-15</td>
+                            <td>Chido Makoni</td>
+                            <td>Tuition — Term 2</td>
+                            <td>$450.00</td>
+                            <td>EcoCash</td>
+                            <td>RCP-2026-004</td>
+                            <td><span class="status-badge paid">Paid</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>2026-03-10</td>
+                            <td>Tawanda Makoni</td>
+                            <td>Tuition — Term 2</td>
+                            <td>$400.00</td>
+                            <td>Bank Transfer</td>
+                            <td>RCP-2026-005</td>
+                            <td><span class="status-badge paid">Paid</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="padding: 16px 28px 0 28px; display: flex; justify-content: space-between; font-size: 13px; color: #6b7a8f; border-top: 1px solid #edf2f7; margin-top: 12px; padding-top: 16px;">
+                <span>Showing 5 of 12 payments</span>
+                <span>
+                    <i class="fas fa-chevron-left" style="margin-right:12px; cursor:pointer;"></i>
+                    Page 1 of 3
+                    <i class="fas fa-chevron-right" style="margin-left:12px; cursor:pointer;"></i>
+                </span>
+            </div>
+        </div>
+
+        <!-- Fee Structure -->
+        <div class="panel-card">
+            <div class="card-title"><i class="fas fa-list-ul"></i> Fee Structure — 2026</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px;">
+                    <div style="font-weight:600; color:#0b1a33;">Tuition</div>
+                    <div style="font-size:15px; font-weight:700; color:#0b1a33;">$400 / term</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Core academic instruction</div>
+                </div>
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px;">
+                    <div style="font-weight:600; color:#0b1a33;">Development Levy</div>
+                    <div style="font-size:15px; font-weight:700; color:#0b1a33;">$100 / term</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Infrastructure & resources</div>
+                </div>
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px;">
+                    <div style="font-weight:600; color:#0b1a33;">Sports Fee</div>
+                    <div style="font-size:15px; font-weight:700; color:#0b1a33;">$50 / term</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Sports & physical education</div>
+                </div>
+                <div style="background:#f8fafd; border-radius:8px; padding:14px 18px;">
+                    <div style="font-weight:600; color:#0b1a33;">Activity Fee</div>
+                    <div style="font-size:15px; font-weight:700; color:#0b1a33;">$50 / term</div>
+                    <div style="font-size:12px; color:#6b7a8f;">Extracurricular activities</div>
+                </div>
+            </div>
+            <div style="margin-top:12px; background:#fef9e7; border-radius:8px; padding:12px 16px; border-left:4px solid #f1c40f;">
+                <span style="font-size:14px; color:#0b1a33;"><i class="fas fa-info-circle" style="color:#f1c40f;"></i> Total per term: <strong>$600</strong> per child</span>
+            </div>
+        </div>
+
+        <!-- Education 5.0 Note -->
+        <div style="background:#fef9e7; border-radius:12px; padding:16px 20px; border-left:4px solid #f1c40f;">
+            <div style="font-size:14px; color:#0b1a33;">
+                <i class="fas fa-info-circle" style="color:#f1c40f;"></i> 
+                <strong>Zimbabwe Primary Education 5.0 — Fees Management:</strong>
+                <br>
+                Stay informed about your children's fee status. View payment history, outstanding balances,
+                and download receipts. Timely fee payments support the school's educational programs.
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:30px; font-size:13px; color:#b0c0d0; border-top:1px solid #e9edf4; padding-top:20px;">
+            Bvute Primary School — Zimbabwe Education 5.0 | Heritage Based Curriculum
+        </div>
+    </main>
+
+    <script>
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const opts = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-ZA', opts) + ' • ' + now.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Load fees button (demo)
+        document.querySelector('.btn-primary')?.addEventListener('click', function(e) {
+            if (this.textContent.includes('Load Fees')) {
+                e.preventDefault();
+                alert('✅ Fees loaded! (Firestore integration coming)');
+            }
+        });
+
+        // Pay Now button
+        document.querySelector('.btn-primary .fa-credit-card')?.closest('.btn-primary')?.addEventListener('click', function() {
+            alert('💳 Payment portal coming soon! (Firestore integration)');
+        });
+
+        // Receipt download
+        document.querySelectorAll('.btn-success .fa-download').forEach(btn => {
+            btn.closest('.btn-success')?.addEventListener('click', function() {
+                alert('⬇️ Downloading receipt... (Firebase Storage integration coming)');
+            });
+        });
+
+        // Logout confirmation
+        document.querySelector('.logout-btn')?.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to logout?')) {
+                e.preventDefault();
+            }
+        });
+
+        console.log('✅ parent/fees.html loaded successfully.');
+        console.log('📌 Parent sees fees and payment history for all their children.');
+    </script>
+
+</body>
+</html>
