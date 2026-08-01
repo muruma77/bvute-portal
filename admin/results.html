@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Results — Bvute Primary School</title>
+<link rel="icon" href="../IMG-20260724-WA5314.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="../IMG-20260724-WA5314.jpg" alt="Bvute Primary School">
+    <div class="brand-text">
+      <div class="school-name">Bvute Primary School</div>
+      <div class="school-sub">Admin Console</div>
+    </div>
+  </div>
+  <div class="user-chip">
+    <span class="role-badge">Admin</span>
+    <span id="userName">…</span>
+    <button class="logout-btn" onclick="logoutUser()">Log out</button>
+  </div>
+</div>
+
+<div class="shell">
+  <a href="dashboard.html" style="font-size:0.82rem;">← Back to dashboard</a>
+
+  <div class="tabs" style="margin-top:14px;">
+    <button class="tab active" data-tab="enter">Enter Marks</button>
+    <button class="tab" data-tab="publish">Publish Results</button>
+  </div>
+
+  <div class="panel" id="panel-enter">
+    <div class="form-card">
+      <h3>Enter test marks</h3>
+      <div class="field-row" style="grid-template-columns: 1fr 1fr 1fr;">
+        <div class="field">
+          <label>Class</label>
+          <select id="mClass">
+            <option value="">— Select —</option>
+            <option>ECD A</option><option>ECD B</option>
+            <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+            <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Term</label>
+          <select id="mTerm">
+            <option>Term 1</option><option>Term 2</option><option>Term 3</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Subject</label>
+          <select id="mSubject">
+            <option value="">— Select —</option>
+            <option>Mathematics</option>
+            <option>English</option>
+            <option>Indigenous Language</option>
+            <option>Social Science</option>
+            <option>Science & Technology</option>
+            <option>PE and Arts</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-hint">Marks are out of 100. Grade is calculated automatically as you type.</div>
+    </div>
+
+    <div id="marksWrap" style="display:none;">
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Learner</th><th style="width:90px;">Mark (/100)</th><th>Grade</th></tr></thead>
+          <tbody id="marksBody"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary" style="margin-top:14px;" id="saveMarksBtn">Save marks</button>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-publish" style="display:none;">
+    <div class="form-card">
+      <h3>Publish results for a class</h3>
+      <div class="field-hint" style="margin-bottom:8px;">
+        This reads the marks saved for all six subjects for the chosen class and term,
+        works out each learner's total, average, grade and class position, and makes it
+        visible on that learner's and their parent's dashboard.
+      </div>
+      <div class="field-row" style="grid-template-columns: 1fr 1fr;">
+        <div class="field">
+          <label>Class</label>
+          <select id="pClass">
+            <option value="">— Select —</option>
+            <option>ECD A</option><option>ECD B</option>
+            <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+            <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Term</label>
+          <select id="pTerm">
+            <option>Term 1</option><option>Term 2</option><option>Term 3</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-gold" style="margin-top:14px;" id="publishBtn">Calculate &amp; Publish</button>
+    </div>
+
+    <div id="publishPreview"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  guardPage('admin', (userData) => {
+    document.getElementById('userName').textContent = userData.fullName || 'Admin';
+  });
+
+  const SUBJECTS = ['Mathematics', 'English', 'Indigenous Language', 'Social Science', 'Science & Technology', 'PE and Arts'];
+
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.style.display = 'block';
+    setTimeout(() => (t.style.display = 'none'), 3500);
+  }
+
+  function gradeFor(mark) {
+    if (mark === '' || mark === null || isNaN(mark)) return '—';
+    const m = Number(mark);
+    if (m >= 80) return 'A';
+    if (m >= 70) return 'B';
+    if (m >= 60) return 'C';
+    if (m >= 50) return 'D';
+    if (m >= 40) return 'E';
+    return 'U';
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      document.getElementById('panel-' + tab.dataset.tab).style.display = 'block';
+    });
+  });
+
+  const mClass = document.getElementById('mClass');
+  const mTerm = document.getElementById('mTerm');
+  const mSubject = document.getElementById('mSubject');
+  let currentLearners = [];
+
+  async function tryLoadMarksForm() {
+    if (!mClass.value || !mSubject.value) { document.getElementById('marksWrap').style.display = 'none'; return; }
+    const wrap = document.getElementById('marksWrap');
+    wrap.style.display = 'block';
+    const body = document.getElementById('marksBody');
+    body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:16px;">Loading learners…</td></tr>';
+
+    try {
+      const snap = await db.collection('users').where('role', '==', 'learner').where('assignedClass', '==', mClass.value).get();
+      currentLearners = [];
+      snap.forEach(doc => currentLearners.push({ id: doc.id, ...doc.data() }));
+
+      if (currentLearners.length === 0) {
+        body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:16px;">No learners assigned to this class yet.</td></tr>';
+        return;
+      }
+
+      const docId = mClass.value + '_' + mTerm.value + '_' + mSubject.value;
+      let existing = {};
+      try {
+        const rdoc = await db.collection('results').doc(docId).get();
+        if (rdoc.exists) existing = rdoc.data().marks || {};
+      } catch (e) {}
+
+      body.innerHTML = '';
+      currentLearners.forEach(l => {
+        const mark = existing[l.id] !== undefined ? existing[l.id] : '';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(l.fullName || '—')}</td>
+          <td><input type="number" min="0" max="100" data-uid="${l.id}" class="markInput" value="${mark}" style="width:70px; padding:6px; border:1px solid var(--line); border-radius:6px;"></td>
+          <td class="gradeCell" data-uid="${l.id}">${gradeFor(mark)}</td>`;
+        body.appendChild(tr);
+      });
+
+      document.querySelectorAll('.markInput').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const cell = document.querySelector('.gradeCell[data-uid="' + inp.dataset.uid + '"]');
+          cell.textContent = gradeFor(inp.value);
+        });
+      });
+    } catch (e) {
+      body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:16px;">Could not load learners.</td></tr>';
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+
+  mClass.addEventListener('change', tryLoadMarksForm);
+  mTerm.addEventListener('change', tryLoadMarksForm);
+  mSubject.addEventListener('change', tryLoadMarksForm);
+
+  document.getElementById('saveMarksBtn').addEventListener('click', async () => {
+    if (!mClass.value || !mSubject.value) return;
+    const marks = {};
+    document.querySelectorAll('.markInput').forEach(inp => {
+      if (inp.value !== '') marks[inp.dataset.uid] = Number(inp.value);
+    });
+    const docId = mClass.value + '_' + mTerm.value + '_' + mSubject.value;
+    try {
+      await db.collection('results').doc(docId).set({
+        className: mClass.value, term: mTerm.value, subject: mSubject.value, marks
+      });
+      showToast('Marks saved for ' + mSubject.value + '.');
+    } catch (e) {
+      showToast('Could not save marks.', true);
+    }
+  });
+
+  document.getElementById('publishBtn').addEventListener('click', async () => {
+    const cls = document.getElementById('pClass').value;
+    const term = document.getElementById('pTerm').value;
+    if (!cls) { showToast('Choose a class first.', true); return; }
+
+    const btn = document.getElementById('publishBtn');
+    btn.disabled = true; btn.textContent = 'Calculating…';
+
+    try {
+      const learnersSnap = await db.collection('users').where('role', '==', 'learner').where('assignedClass', '==', cls).get();
+      const learners = [];
+      learnersSnap.forEach(doc => learners.push({ id: doc.id, fullName: doc.data().fullName || 'Unnamed' }));
+
+      if (learners.length === 0) {
+        showToast('No learners in this class.', true);
+        btn.disabled = false; btn.textContent = 'Calculate & Publish';
+        return;
+      }
+
+      const perLearner = {};
+      learners.forEach(l => perLearner[l.id] = { fullName: l.fullName, subjects: {}, total: 0, count: 0 });
+
+      for (const subject of SUBJECTS) {
+        const docId = cls + '_' + term + '_' + subject;
+        const rdoc = await db.collection('results').doc(docId).get();
+        if (!rdoc.exists) continue;
+        const marks = rdoc.data().marks || {};
+        learners.forEach(l => {
+          const m = marks[l.id];
+          if (m !== undefined) {
+            perLearner[l.id].subjects[subject] = { mark: m, grade: gradeFor(m) };
+            perLearner[l.id].total += m;
+            perLearner[l.id].count += 1;
+          }
+        });
+      }
+
+      const ranked = learners.map(l => {
+        const rec = perLearner[l.id];
+        const average = rec.count > 0 ? rec.total / rec.count : 0;
+        return { id: l.id, fullName: rec.fullName, subjects: rec.subjects, total: rec.total, average, grade: gradeFor(average) };
+      }).sort((a, b) => b.total - a.total);
+
+      let rank = 0, prevTotal = null, learnersOut = {};
+      ranked.forEach((r, idx) => {
+        if (r.total !== prevTotal) { rank = idx + 1; prevTotal = r.total; }
+        learnersOut[r.id] = { fullName: r.fullName, subjects: r.subjects, total: r.total, average: Math.round(r.average * 10) / 10, grade: r.grade, position: rank };
+      });
+
+      const summaryId = cls + '_' + term;
+      await db.collection('results_summary').doc(summaryId).set({
+        className: cls, term, classSize: learners.length, learners: learnersOut,
+        publishedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      showToast('Results published for ' + cls + ' — ' + term + '.');
+      renderPreview(ranked, learners.length);
+    } catch (e) {
+      showToast('Could not publish results.', true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Calculate & Publish';
+    }
+  });
+
+  function renderPreview(ranked, classSize) {
+    const el = document.getElementById('publishPreview');
+    let rows = ranked.map((r, idx) => `
+      <tr><td>${idx + 1}</td><td>${escapeHtml(r.fullName)}</td><td>${r.total}</td><td>${(Math.round(r.average*10)/10)}</td><td>${r.grade}</td></tr>
+    `).join('');
+    el.innerHTML = `
+      <div class="data-table-wrap" style="margin-top:16px;">
+        <table class="data-table">
+          <thead><tr><th>Position</th><th>Learner</th><th>Total</th><th>Average</th><th>Grade</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="field-hint" style="margin-top:8px;">Class size: ${classSize}</div>`;
+  }
+</script>
+</body>
+</html>
