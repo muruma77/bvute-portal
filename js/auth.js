@@ -1,5 +1,5 @@
 // ============================================
-// BVUTE PORTAL - Firebase Authentication
+// BVUTE PORTAL - Firebase Authentication (FIXED)
 // ============================================
 
 // ⚠️ IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG
@@ -16,6 +16,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+console.log('✅ Firebase initialized');
 
 // DOM Elements
 const roleOptions = document.querySelectorAll('.role-option');
@@ -43,9 +45,16 @@ function showAlert(message, type = 'danger') {
     setTimeout(() => { alertDiv.classList.remove('show'); }, 5000);
 }
 
+// --- Reset Login Button ---
+function resetLoginButton() {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+}
+
 // --- LOGIN ---
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
@@ -55,19 +64,25 @@ loginForm.addEventListener('submit', async (e) => {
     }
 
     loginBtn.disabled = true;
-    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
     try {
+        console.log('Attempting login for:', email);
+        
+        // Sign in with Firebase Auth
         const userCred = await auth.signInWithEmailAndPassword(email, password);
         const user = userCred.user;
+        
+        console.log('✅ User authenticated:', user.uid);
 
         // Fetch user profile from Firestore
-        const doc = await db.collection('users').doc(user.uid).get();
+        const docRef = db.collection('users').doc(user.uid);
+        const doc = await docRef.get();
+        
         if (!doc.exists) {
             await auth.signOut();
             showAlert('User profile not found. Contact admin.', 'danger');
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            resetLoginButton();
             return;
         }
 
@@ -79,8 +94,7 @@ loginForm.addEventListener('submit', async (e) => {
         if (status === 'disabled') {
             await auth.signOut();
             showAlert('Your account has been disabled. Contact admin.', 'danger');
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            resetLoginButton();
             return;
         }
 
@@ -88,11 +102,12 @@ loginForm.addEventListener('submit', async (e) => {
         if (selectedRole !== dbRole) {
             await auth.signOut();
             showAlert(`You selected "${selectedRole}" but this account is registered as "${dbRole}".`, 'danger');
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            resetLoginButton();
             return;
         }
 
+        console.log('✅ Login successful. Redirecting to:', dbRole);
+        
         // Redirect based on role
         const redirectMap = {
             'admin': 'admin/dashboard.html',
@@ -103,32 +118,33 @@ loginForm.addEventListener('submit', async (e) => {
         window.location.href = redirectMap[dbRole] || 'index.html';
 
     } catch (error) {
+        console.error('Login error:', error.code, error.message);
+        
         let msg = 'Login failed. Check credentials.';
         if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
         if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
         if (error.code === 'auth/too-many-requests') msg = 'Too many failed attempts. Try later.';
         if (error.code === 'auth/invalid-email') msg = 'Invalid email format.';
         if (error.code === 'auth/network-request-failed') msg = 'Network error. Check your internet connection.';
+        if (error.code === 'auth/configuration-not-found') msg = 'Firebase configuration error. Check your config.';
+        
         showAlert(msg, 'danger');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+        resetLoginButton();
     }
 });
 
-// --- Password Reset Request (for users) ---
-document.getElementById('resetRequestBtn').addEventListener('click', async () => {
+// --- Password Reset Request ---
+document.getElementById('resetRequestBtn')?.addEventListener('click', async () => {
     const email = prompt('Enter your registered email address to request a password reset:');
     if (!email) return;
 
     try {
-        // Check if user exists in Firestore
         const snapshot = await db.collection('users').where('email', '==', email).get();
         if (snapshot.empty) {
             alert('No account found with this email.');
             return;
         }
 
-        // Create reset request in Firestore
         const docId = snapshot.docs[0].id;
         await db.collection('passwordResets').add({
             uid: docId,
@@ -144,10 +160,4 @@ document.getElementById('resetRequestBtn').addEventListener('click', async () =>
     }
 });
 
-// --- Admin: Approve Resets (Hidden feature) ---
-document.getElementById('resetApprovalBtn').addEventListener('click', async () => {
-    alert('Go to Admin Dashboard -> Settings -> Password Reset Approvals.');
-});
-
-console.log('✅ Firebase Auth loaded successfully.');
-console.log('📌 BVUTE Primary School Portal ready.');
+console.log('✅ BVUTE Portal Auth loaded successfully.');
