@@ -1,7 +1,3 @@
-// ============================================
-// BVUTE PORTAL - Firebase Authentication
-// ============================================
-
 const firebaseConfig = {
   apiKey: "AIzaSyDi-fHhHUHv2zy3lhbQJH4fEf8CeV6HRA0",
   authDomain: "bvute-primary-school.firebaseapp.com",
