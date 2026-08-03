@@ -1,71 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bvute Primary School Portal</title>
-    <link rel="icon" href="IMG-20260724-WA5314.jpg" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Bvute Primary</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="login-wrapper">
         <div class="login-card">
-
-            <!-- Brand -->
             <div class="brand">
-                <img src="IMG-20260724-WA5314.jpg" alt="Bvute School Crest">
-                <h1>Bvute <span>Primary</span></h1>
-                <p>📚 Education 5.0 · Heritage Based Curriculum</p>
+                <h1>Bvute Primary</h1>
+                <p>Education 5.0</p>
             </div>
 
-            <!-- Alert Messages -->
             <div id="alertMessage" class="alert"></div>
 
-            <!-- Role Selector -->
             <div class="role-selector" id="roleSelector">
-                <div class="role-option active" data-role="admin">
-                    <i class="fas fa-user-tie"></i> Admin
-                </div>
-                <div class="role-option" data-role="teacher">
-                    <i class="fas fa-chalkboard-user"></i> Teacher
-                </div>
-                <div class="role-option" data-role="parent">
-                    <i class="fas fa-user-friends"></i> Parent
-                </div>
-                <div class="role-option" data-role="learner">
-                    <i class="fas fa-user-graduate"></i> Learner
-                </div>
+                <div class="role-option active" data-role="admin">Admin</div>
+                <div class="role-option" data-role="teacher">Teacher</div>
+                <div class="role-option" data-role="parent">Parent</div>
+                <div class="role-option" data-role="learner">Learner</div>
             </div>
 
-            <!-- Login Form -->
             <form id="loginForm">
                 <div class="form-group">
-                    <label>Email Address <span class="required">*</span></label>
-                    <input type="email" id="emailInput" placeholder="e.g. admin@bvute.school" required>
+                    <label>Email</label>
+                    <input type="email" id="emailInput" placeholder="Enter email" required>
                 </div>
                 <div class="form-group">
-                    <label>Password <span class="required">*</span></label>
-                    <input type="password" id="passwordInput" placeholder="Enter your password" required>
+                    <label>Password</label>
+                    <input type="password" id="passwordInput" placeholder="Enter password" required>
                 </div>
-
-                <button type="submit" class="btn-login" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
+                <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
             </form>
 
-            <!-- Extra Actions -->
             <div class="text-center mt-20">
-                <button class="btn-link" id="resetRequestBtn">
-                    <i class="fas fa-key"></i> Forgot Password?
-                </button>
+                <button class="btn-link" id="resetRequestBtn">Forgot Password?</button>
             </div>
 
             <div class="text-center mt-12" style="font-size:13px; color:#b0c0d0;">
-                <i class="fas fa-shield-alt"></i> Bvute Primary School
+                Bvute Primary School
             </div>
-
         </div>
     </div>
 
