@@ -1,5 +1,11 @@
+// ============================================
+// BVUTE PORTAL - Simple Login
+// Credentials: bvuteprimary64@gmail.com / bvute2026
+// ============================================
+
 document.addEventListener('DOMContentLoaded', function() {
 
+    // DOM Elements
     const roleOptions = document.querySelectorAll('.role-option');
     const loginForm = document.getElementById('loginForm');
     const emailInput = document.getElementById('emailInput');
@@ -9,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let selectedRole = 'admin';
 
+    // --- Role Selection ---
     roleOptions.forEach(opt => {
         opt.addEventListener('click', function() {
             roleOptions.forEach(o => o.classList.remove('active'));
@@ -17,12 +24,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // --- Show Alert ---
     function showAlert(message, type = 'danger') {
         alertDiv.textContent = message;
         alertDiv.className = `alert alert-${type} show`;
         setTimeout(() => { alertDiv.classList.remove('show'); }, 5000);
     }
 
+    // --- Login ---
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -34,8 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Hardcoded credentials
         if (email === 'bvuteprimary64@gmail.com' && password === 'bvute2026') {
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
+            
+            // Role-based redirect
             const redirectMap = {
                 'admin': 'admin/dashboard.html',
                 'teacher': 'teacher/dashboard.html',
@@ -48,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // --- Forgot Password ---
     document.getElementById('resetRequestBtn')?.addEventListener('click', function() {
         alert('Contact the school administrator to reset your password.');
     });
